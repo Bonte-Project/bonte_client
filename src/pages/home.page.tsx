@@ -1,3 +1,4 @@
+// src\pages\home.page.tsx
 const HomePage = () => {
   return (
     <div className='p-2'>
