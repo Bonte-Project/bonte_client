@@ -55,7 +55,7 @@ function Header() {
   ];
 
   return (
-    <div className='flex min-h-screen bg-[#1e1416]'>
+    <>
       {/* Mobile Menu Toggle Button */}
       <button
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -65,9 +65,9 @@ function Header() {
         {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
-      {/* Sidebar */}
+      {/* Sidebar - КЛЮЧЕВЫЕ ИЗМЕНЕНИЯ: h-screen overflow-y-auto fixed */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-[#181114] border-r border-white/10 transition-transform duration-300 ${
+        className={`fixed top-0 left-0 z-40 w-64 h-screen bg-[#181114] border-r border-white/10 overflow-y-auto transition-transform duration-300 ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
@@ -214,7 +214,7 @@ function Header() {
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
-    </div>
+    </>
   );
 }
 

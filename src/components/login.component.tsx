@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
 import { FormValidator } from '@/utils/form-validator.utils';
 import { Eye, EyeOff, Zap, Droplet, Star } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 
 interface FormData {
   email: string;
@@ -19,10 +20,14 @@ interface FormErrors {
   general?: string;
 }
 
+interface GoogleCredentialResponse {
+  credential: string;
+}
+
 function LoginForm() {
   const navigate = useNavigate();
-  const { login, isLoading, error, clearError } = useAuthStore();
-  const { success, error: toastError } = useCustomToast();
+  const { login, isLoading, error, clearError, loginWithGoogle } = useAuthStore();
+  const { success, error: toastError, warning } = useCustomToast();
 
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -126,6 +131,42 @@ function LoginForm() {
     })();
   };
 
+  // Fixed: Properly handle async Google login
+  const handleGoogleSuccess = (credentialResponse: unknown) => {
+    void (async () => {
+      const response = credentialResponse as GoogleCredentialResponse;
+      const token = response?.credential;
+      if (!token) {
+        toastError('Google Authentication Failed', {
+          description: 'No token received from Google',
+        });
+        return;
+      }
+
+      try {
+        const jwt = await loginWithGoogle(token);
+        if (jwt) {
+          localStorage.setItem('access_token', jwt);
+          success('Google Login Successful', {
+            description: 'Redirecting to dashboard...',
+          });
+          setTimeout(() => void navigate({ to: '/' }), 1500);
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Google authentication failed';
+        toastError('Authentication Error', {
+          description: errorMessage,
+        });
+      }
+    })();
+  };
+
+  const handleGoogleError = () => {
+    warning('Google Authentication', {
+      description: 'An error occurred during Google sign-up. Please try again.',
+    });
+  };
+
   return (
     <div className='relative min-h-screen w-full overflow-hidden bg-[#1e1416]'>
       {/* Background gradient */}
@@ -176,7 +217,7 @@ function LoginForm() {
                   )}
                 </div>
 
-                {/* Password Field */}
+                {/* Password Field - FIXED */}
                 <div className='flex flex-col'>
                   <div className='flex items-center justify-between pb-2'>
                     <label
@@ -195,7 +236,7 @@ function LoginForm() {
                       </Button>
                     </Link>
                   </div>
-                  <div className='relative flex w-full items-stretch'>
+                  <div className='relative'>
                     <Input
                       id='password'
                       type={showPassword ? 'text' : 'password'}
@@ -204,7 +245,7 @@ function LoginForm() {
                       onChange={e => handleInputChange('password', e.target.value)}
                       onBlur={() => handleBlur('password')}
                       disabled={isLoading}
-                      className={`h-14 w-full flex-1 resize-none overflow-hidden rounded-l-lg border border-r-0 bg-[#141414] p-[15px] text-base font-normal leading-normal text-white placeholder:text-gray-500 transition-shadow duration-300 focus:outline-0 focus:ring-2
+                      className={`h-14 w-full resize-none overflow-hidden rounded-lg border bg-[#141414] p-[15px] pr-12 text-base font-normal leading-normal text-white placeholder:text-gray-500 transition-shadow duration-300 focus:outline-0 focus:ring-2
                         ${
                           errors.password && touched.has('password')
                             ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/40'
@@ -215,7 +256,8 @@ function LoginForm() {
                       type='button'
                       onClick={() => setShowPassword(!showPassword)}
                       disabled={isLoading}
-                      className='flex items-center justify-center rounded-r-lg border border-l-0 border-white/10 bg-[#141414] px-4 text-gray-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                      className='absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-500 hover:text-white transition-colors p-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -236,7 +278,7 @@ function LoginForm() {
                 <Button
                   type='submit'
                   disabled={isLoading}
-                  className='w-full transform rounded-lg bg-[#D98A9D] py-4 text-base font-bold text-white shadow-lg shadow-[#D98A9D]/20 transition-all duration-300 ease-in-out hover:bg-[#c87b8f] hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-[#D98A9D]/50 disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100'
+                  className='w-full transform rounded-lg bg-[#D98A9D] py-5 text-base font-bold text-white shadow-lg shadow-[#D98A9D]/20 transition-all duration-300 ease-in-out hover:bg-[#c87b8f] hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-[#D98A9D]/50 disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100'
                 >
                   {isLoading ? 'Logging in...' : 'Log In'}
                 </Button>
@@ -251,25 +293,20 @@ function LoginForm() {
                 <div className='flex-1 h-px bg-white/10'></div>
               </div>
 
-              {/* Google Sign In Button */}
-              <Button
-                type='button'
-                variant='outline'
-                className='w-full border-white/10 text-white hover:bg-white/5 hover:text-[#D98A9D]'
-                disabled={isLoading}
-              >
-                <svg
-                  className='w-5 h-5 text-[#D98A9D] mr-2'
-                  viewBox='0 0 24 24'
-                  fill='currentColor'
-                >
-                  <path d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z' />
-                  <path d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z' />
-                  <path d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z' />
-                  <path d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z' />
-                </svg>
-                Sign in with Google
-              </Button>
+              {/* Google Sign-Up */}
+              <div className='w-full flex justify-center '>
+                <div className='w-full max-w-none'>
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    theme='outline'
+                    shape='pill'
+                    text='signup_with'
+                    width='100%'
+                    useOneTap
+                  />
+                </div>
+              </div>
 
               <p className='mt-8 text-center text-sm text-gray-400'>
                 Don&apos;t have an account?{' '}
@@ -302,7 +339,7 @@ function LoginForm() {
                   <Zap size={24} />
                 </div>
                 <div>
-                  <h3 className='text-lg font-bold'>Strength Tracking</h3>
+                  <h3 className='text-lg font-bold'>?Strength Tracking?</h3>
                   <p className='text-gray-400'>
                     Log every set and rep to monitor your progress and crush your personal records.
                   </p>
@@ -313,7 +350,7 @@ function LoginForm() {
                   <Droplet size={24} />
                 </div>
                 <div>
-                  <h3 className='text-lg font-bold'>Hydration Reminders</h3>
+                  <h3 className='text-lg font-bold'>?Hydration Reminders?</h3>
                   <p className='text-gray-400'>
                     Never miss a sip with intelligent reminders that keep you perfectly hydrated all
                     day.
@@ -325,7 +362,7 @@ function LoginForm() {
                   <Star size={24} />
                 </div>
                 <div>
-                  <h3 className='text-lg font-bold'>Personal Achievements</h3>
+                  <h3 className='text-lg font-bold'>?Personal Achievements?</h3>
                   <p className='text-gray-400'>
                     Stay motivated by unlocking milestones and celebrating your consistent effort.
                   </p>

@@ -1,3 +1,4 @@
+// src\components\layout.component.tsx
 import type { ReactNode } from 'react';
 import { Header } from './header.component';
 
@@ -5,27 +6,17 @@ interface LayoutProps {
   children: ReactNode;
 }
 
-/**
- * Layout компонент - главная обёртка для всех страниц приложения
- * Содержит Header, который отображается на всех страницах
- * Управляет главной сеткой приложения
- *
- * @example
- * <Layout>
- *   <YourPageContent />
- * </Layout>
- */
 export function Layout({ children }: LayoutProps) {
   return (
-    <div className='flex min-h-screen bg-[#1e1416]'>
-      {/* Header/Sidebar */}
+    <>
       <Header />
 
-      {/* Main Content Area */}
-      <main className='flex-1 p-6 lg:p-10 overflow-auto'>
-        <div className='max-w-7xl mx-auto'>{children}</div>
+      {/* КЛЮЧЕВОЕ: ml-64 добавляет отступ слева на десктопе, чтобы контент не заезжал под sidebar */}
+      {/* На мобилях нет отступа, т.к. sidebar фиксированный и overlay */}
+      <main className='lg:ml-64 min-h-screen bg-[#1e1416] overflow-auto'>
+        <div className='p-6 lg:p-10 max-w-7xl mx-auto'>{children}</div>
       </main>
-    </div>
+    </>
   );
 }
 

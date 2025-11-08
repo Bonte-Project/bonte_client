@@ -47,7 +47,7 @@ function RegisterForm() {
     confirmPassword: '',
   });
 
-  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
+  const [selectedRole, setSelectedRole] = useState<UserRole>('user');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -157,7 +157,7 @@ function RegisterForm() {
         fullName: formData.fullName,
         email: formData.email,
         password: formData.password,
-        role: selectedRole!,
+        role: selectedRole,
       });
 
       if (successResult) {
@@ -283,7 +283,7 @@ function RegisterForm() {
                   )}
                 </div>
 
-                {/* Password Field */}
+                {/* Password Field - FIXED */}
                 <div className='flex flex-col'>
                   <label
                     htmlFor='password'
@@ -291,7 +291,7 @@ function RegisterForm() {
                   >
                     Password
                   </label>
-                  <div className='relative flex w-full items-stretch'>
+                  <div className='relative'>
                     <Input
                       id='password'
                       type={showPassword ? 'text' : 'password'}
@@ -300,7 +300,7 @@ function RegisterForm() {
                       onChange={e => handleInputChange('password', e.target.value)}
                       onBlur={() => handleBlur('password')}
                       disabled={isLoading}
-                      className={`h-14 w-full flex-1 resize-none overflow-hidden rounded-l-lg border border-r-0 bg-[#141414] p-[15px] text-base font-normal leading-normal text-white placeholder:text-gray-500 transition-shadow duration-300 focus:outline-0 focus:ring-2
+                      className={`h-14 w-full resize-none overflow-hidden rounded-lg border bg-[#141414] p-[15px] pr-12 text-base font-normal leading-normal text-white placeholder:text-gray-500 transition-shadow duration-300 focus:outline-0 focus:ring-2
                         ${
                           errors.password && touched.has('password')
                             ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/40'
@@ -311,7 +311,8 @@ function RegisterForm() {
                       type='button'
                       onClick={() => setShowPassword(!showPassword)}
                       disabled={isLoading}
-                      className='flex items-center justify-center rounded-r-lg border border-l-0 border-white/10 bg-[#141414] px-4 text-gray-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                      className='absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-500 hover:text-white transition-colors p-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -321,7 +322,7 @@ function RegisterForm() {
                   )}
                 </div>
 
-                {/* Confirm Password Field */}
+                {/* Confirm Password Field - FIXED */}
                 <div className='flex flex-col'>
                   <label
                     htmlFor='confirmPassword'
@@ -329,7 +330,7 @@ function RegisterForm() {
                   >
                     Confirm Password
                   </label>
-                  <div className='relative flex w-full items-stretch'>
+                  <div className='relative'>
                     <Input
                       id='confirmPassword'
                       type={showConfirmPassword ? 'text' : 'password'}
@@ -338,7 +339,7 @@ function RegisterForm() {
                       onChange={e => handleInputChange('confirmPassword', e.target.value)}
                       onBlur={() => handleBlur('confirmPassword')}
                       disabled={isLoading}
-                      className={`h-14 w-full flex-1 resize-none overflow-hidden rounded-l-lg border border-r-0 bg-[#141414] p-[15px] text-base font-normal leading-normal text-white placeholder:text-gray-500 transition-shadow duration-300 focus:outline-0 focus:ring-2
+                      className={`h-14 w-full resize-none overflow-hidden rounded-lg border bg-[#141414] p-[15px] pr-12 text-base font-normal leading-normal text-white placeholder:text-gray-500 transition-shadow duration-300 focus:outline-0 focus:ring-2
                         ${
                           errors.confirmPassword && touched.has('confirmPassword')
                             ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/40'
@@ -349,7 +350,8 @@ function RegisterForm() {
                       type='button'
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       disabled={isLoading}
-                      className='flex items-center justify-center rounded-r-lg border border-l-0 border-white/10 bg-[#141414] px-4 text-gray-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                      className='absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-500 hover:text-white transition-colors p-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                      aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                     >
                       {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -401,7 +403,7 @@ function RegisterForm() {
                 <Button
                   type='submit'
                   disabled={isLoading}
-                  className='w-full transform rounded-lg bg-[#D98A9D] py-4 text-base font-bold text-white shadow-lg shadow-[#D98A9D]/20 transition-all duration-300 ease-in-out hover:bg-[#c87b8f] hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-[#D98A9D]/50 disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100'
+                  className='w-full transform rounded-lg bg-[#D98A9D] py-5 text-base font-bold text-white shadow-lg shadow-[#D98A9D]/20 transition-all duration-300 ease-in-out hover:bg-[#c87b8f] hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-[#D98A9D]/50 disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100'
                 >
                   {isLoading ? 'Registering...' : 'Register'}
                 </Button>
@@ -417,15 +419,18 @@ function RegisterForm() {
               </div>
 
               {/* Google Sign-Up */}
-              <div className='w-full flex justify-center'>
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={handleGoogleError}
-                  theme='outline'
-                  shape='pill'
-                  text='signup_with'
-                  useOneTap
-                />
+              <div className='w-full flex justify-center '>
+                <div className='w-full max-w-none'>
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    theme='outline'
+                    shape='pill'
+                    text='signup_with'
+                    width='100%'
+                    useOneTap
+                  />
+                </div>
               </div>
 
               <p className='mt-8 text-center text-sm text-gray-400'>
@@ -459,7 +464,7 @@ function RegisterForm() {
                   <Zap size={24} />
                 </div>
                 <div>
-                  <h3 className='text-lg font-bold'>Strength Tracking</h3>
+                  <h3 className='text-lg font-bold'>?Strength Tracking?</h3>
                   <p className='text-gray-400'>
                     Log every set and rep to monitor your progress and crush your personal records.
                   </p>
@@ -470,7 +475,7 @@ function RegisterForm() {
                   <Droplet size={24} />
                 </div>
                 <div>
-                  <h3 className='text-lg font-bold'>Hydration Reminders</h3>
+                  <h3 className='text-lg font-bold'>?Hydration Reminders?</h3>
                   <p className='text-gray-400'>
                     Never miss a sip with intelligent reminders that keep you perfectly hydrated all
                     day.
@@ -482,7 +487,7 @@ function RegisterForm() {
                   <Star size={24} />
                 </div>
                 <div>
-                  <h3 className='text-lg font-bold'>Personal Achievements</h3>
+                  <h3 className='text-lg font-bold'>?Personal Achievements?</h3>
                   <p className='text-gray-400'>
                     Stay motivated by unlocking milestones and celebrating your consistent effort.
                   </p>
