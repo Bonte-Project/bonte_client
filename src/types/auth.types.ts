@@ -1,5 +1,3 @@
-// src/types/auth.types.ts
-
 export type UserRole = 'user' | 'trainer' | 'admin';
 
 export interface RegisterRequest {

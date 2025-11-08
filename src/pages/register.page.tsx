@@ -1,4 +1,3 @@
-// src\pages\register.page.tsx
 import { RegisterForm } from '@/components/register.component.tsx';
 
 const RegisterPage = () => {

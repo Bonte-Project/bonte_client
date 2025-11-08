@@ -1,6 +1,5 @@
-// src\components\login.component.tsx
 import { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuthStore } from '@/store/auth.store';
@@ -24,10 +23,11 @@ interface GoogleCredentialResponse {
   credential: string;
 }
 
-function LoginForm() {
+export const LoginForm = () => {
   const navigate = useNavigate();
   const { login, isLoading, error, clearError, loginWithGoogle } = useAuthStore();
   const { success, error: toastError, warning } = useCustomToast();
+  const location = useLocation();
 
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -39,21 +39,23 @@ function LoginForm() {
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const toastShownRef = useRef(false);
 
-  // Fixed: Only show toast in effect, don't set state
+  useEffect(() => {
+    clearError();
+  }, [location.pathname, clearError]);
+
   useEffect(() => {
     if (error && !toastShownRef.current) {
       toastShownRef.current = true;
       toastError('Login Failed', {
         description: error,
       });
+    }
 
-      return () => {
-        toastShownRef.current = false;
-      };
+    if (!error) {
+      toastShownRef.current = false;
     }
   }, [error, toastError]);
 
-  // Derive general error from store error
   const generalError = error || undefined;
 
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -97,7 +99,6 @@ function LoginForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Fixed: Wrap async function to satisfy TypeScript
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -131,7 +132,6 @@ function LoginForm() {
     })();
   };
 
-  // Fixed: Properly handle async Google login
   const handleGoogleSuccess = (credentialResponse: unknown) => {
     void (async () => {
       const response = credentialResponse as GoogleCredentialResponse;
@@ -217,7 +217,7 @@ function LoginForm() {
                   )}
                 </div>
 
-                {/* Password Field - FIXED */}
+                {/* Password Field */}
                 <div className='flex flex-col'>
                   <div className='flex items-center justify-between pb-2'>
                     <label
@@ -374,6 +374,4 @@ function LoginForm() {
       </main>
     </div>
   );
-}
-
-export { LoginForm };
+};

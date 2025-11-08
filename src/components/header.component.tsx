@@ -1,4 +1,3 @@
-// src\components\header.component.tsx
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
@@ -18,7 +17,7 @@ import {
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
 import { useAuthStore } from '@/store/auth.store';
 
-function Header() {
+export const Header = () => {
   const navigate = useNavigate();
   const { user, logout, fetchMe } = useAuthStore();
   const { success, error: toastError } = useCustomToast();
@@ -65,16 +64,16 @@ function Header() {
         {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
-      {/* Sidebar - КЛЮЧЕВЫЕ ИЗМЕНЕНИЯ: h-screen overflow-y-auto fixed */}
+      {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-40 w-64 h-screen bg-[#181114] border-r border-white/10 overflow-y-auto transition-transform duration-300 ${
+        className={`fixed top-0 left-0 z-40 w-64 h-screen bg-[#181114] border-r border-white/10  transition-transform duration-300 ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         <div className='flex h-full flex-col justify-between p-4'>
           {/* Top Section */}
           <div className='flex flex-col gap-4'>
-            {/* User Section - Conditional Display */}
+            {/* User Section */}
             {user ? (
               <div className='flex gap-3 items-center p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors'>
                 <div className='w-10 h-10 rounded-full bg-linear-to-br from-[#D98A9D] to-[#ec1380] flex items-center justify-center text-white font-bold text-lg'>
@@ -216,6 +215,4 @@ function Header() {
       )}
     </>
   );
-}
-
-export { Header };
+};

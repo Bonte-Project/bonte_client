@@ -1,4 +1,3 @@
-// src\pages\verify-email.page.tsx
 import { VerifyEmailForm } from '@/components/verify-email.component.tsx';
 
 const VerifyEmailPage = () => {

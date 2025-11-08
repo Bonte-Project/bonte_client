@@ -1,11 +1,7 @@
 import { Toaster } from '@/components/ui/sonner';
-import '@/styles/toast-provider.style.css'; // создадим отдельный CSS-файл
+import '@/styles/toast-provider.style.css';
 
-/**
- * Toast Provider Component
- * Wraps the Sonner Toaster with custom styling
- */
-function ToastProvider() {
+export const ToastProvider = () => {
   return (
     <Toaster
       position='top-right'
@@ -14,7 +10,7 @@ function ToastProvider() {
       closeButton
       theme='dark'
       toastOptions={{
-        className: 'custom-toast', // базовый класс
+        className: 'custom-toast',
       }}
       style={
         {
@@ -25,6 +21,4 @@ function ToastProvider() {
       }
     />
   );
-}
-
-export { ToastProvider };
+};

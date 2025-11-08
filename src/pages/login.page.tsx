@@ -1,4 +1,3 @@
-// src\pages\login.page.tsx
 import { LoginForm } from '@/components/login.component.tsx';
 
 const LoginPage = () => {

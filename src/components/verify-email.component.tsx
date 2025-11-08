@@ -1,4 +1,3 @@
-// src\components\verify-email.component.tsx
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,7 @@ interface FormErrors {
   general?: string;
 }
 
-function VerifyEmailForm() {
+export const VerifyEmailForm = () => {
   const { verifyEmail, isLoading, error, clearError, registeredEmail, setRegisteredEmailCode } =
     useAuthStore();
   const navigate = useNavigate();
@@ -24,7 +23,6 @@ function VerifyEmailForm() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const toastShownRef = useRef(false);
 
-  // Fixed: Derive error state instead of setting it in useEffect
   useEffect(() => {
     if (error && !toastShownRef.current) {
       toastShownRef.current = true;
@@ -38,11 +36,9 @@ function VerifyEmailForm() {
     }
   }, [error, toastError]);
 
-  // Derive general error from store error
   const generalError = error || undefined;
 
   const handleCodeChange = (index: number, value: string) => {
-    // Only allow digits
     if (value && !/^\d$/.test(value)) return;
 
     const newCode = [...code];
@@ -54,7 +50,6 @@ function VerifyEmailForm() {
 
     setTouched(prev => new Set([...prev, index]));
 
-    // Move to next input if value is entered
     if (value && index < 3) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -63,10 +58,8 @@ function VerifyEmailForm() {
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace') {
       if (!code[index] && index > 0) {
-        // Move to previous input on backspace if current is empty
         inputRefs.current[index - 1]?.focus();
       } else if (code[index]) {
-        // Clear current input
         const newCode = [...code];
         newCode[index] = '';
         setCode(newCode);
@@ -103,7 +96,6 @@ function VerifyEmailForm() {
     return true;
   };
 
-  // Fixed: Wrap async function to satisfy TypeScript
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -267,6 +259,4 @@ function VerifyEmailForm() {
       </main>
     </div>
   );
-}
-
-export { VerifyEmailForm };
+};

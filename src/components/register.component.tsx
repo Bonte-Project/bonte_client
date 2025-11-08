@@ -1,6 +1,6 @@
 // src\components\register.component.tsx
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate, Link } from '@tanstack/react-router';
+import { useNavigate, Link, useLocation } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuthStore } from '@/store/auth.store';
@@ -30,15 +30,11 @@ interface GoogleCredentialResponse {
   credential: string;
 }
 
-/**
- * RegisterForm Component
- * User registration form with validation and toast notifications
- * Supports email/password and Google authentication
- */
-function RegisterForm() {
+export const RegisterForm = () => {
   const navigate = useNavigate();
   const { register, isLoading, error, clearError, loginWithGoogle } = useAuthStore();
   const { success, error: toastError, warning } = useCustomToast();
+  const location = useLocation();
 
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
@@ -54,21 +50,19 @@ function RegisterForm() {
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const toastShownRef = useRef(false);
 
-  // Fixed: Only show toast, don't set state in effect
+  useEffect(() => {
+    clearError();
+  }, [location.pathname, clearError]);
+
   useEffect(() => {
     if (error && !toastShownRef.current) {
       toastShownRef.current = true;
       toastError('Registration Failed', {
         description: error,
       });
-
-      return () => {
-        toastShownRef.current = false;
-      };
     }
   }, [error, toastError]);
 
-  // Derive general error from store error
   const generalError = error || undefined;
 
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -131,7 +125,6 @@ function RegisterForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Fixed: Wrap async function to satisfy TypeScript
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -169,7 +162,6 @@ function RegisterForm() {
     })();
   };
 
-  // Fixed: Properly handle async Google login
   const handleGoogleSuccess = (credentialResponse: unknown) => {
     void (async () => {
       const response = credentialResponse as GoogleCredentialResponse;
@@ -283,7 +275,7 @@ function RegisterForm() {
                   )}
                 </div>
 
-                {/* Password Field - FIXED */}
+                {/* Password Field */}
                 <div className='flex flex-col'>
                   <label
                     htmlFor='password'
@@ -322,7 +314,7 @@ function RegisterForm() {
                   )}
                 </div>
 
-                {/* Confirm Password Field - FIXED */}
+                {/* Confirm Password Field */}
                 <div className='flex flex-col'>
                   <label
                     htmlFor='confirmPassword'
@@ -499,6 +491,4 @@ function RegisterForm() {
       </main>
     </div>
   );
-}
-
-export { RegisterForm };
+};

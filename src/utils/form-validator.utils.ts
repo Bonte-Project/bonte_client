@@ -1,4 +1,3 @@
-//src\utils\form-validator.utils.ts
 export class FormValidator {
   private static readonly EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   private static readonly PASSWORD_MIN_LENGTH = 8;

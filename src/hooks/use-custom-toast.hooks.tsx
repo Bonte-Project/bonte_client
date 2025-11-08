@@ -10,18 +10,7 @@ interface ToastOptions {
   duration?: number;
 }
 
-/**
- * Custom Toast Hook
- * Provides typed toast notifications with icons and custom styling
- *
- * @example
- * const { success, error, info, warning } = useCustomToast();
- *
- * success('Account created', {
- *   description: 'You can now sign in'
- * });
- */
-export function useCustomToast() {
+export const useCustomToast = () => {
   const success = (title: string, options?: ToastOptions) => {
     return toast.custom(
       () => (
@@ -155,4 +144,4 @@ export function useCustomToast() {
   };
 
   return { success, error, info, warning };
-}
+};
