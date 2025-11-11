@@ -45,6 +45,13 @@ export interface User {
   email: string;
   fullName: string;
   role: UserRole;
+  avatarUrl: string;
+  isEmailVerified: boolean;
+  height: number;
+  weight: number;
+  age: number;
+  createdAt: string;
+  isPremium: boolean;
 }
 
 export interface MeResponse {

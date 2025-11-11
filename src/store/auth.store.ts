@@ -1,3 +1,4 @@
+// src\store\auth.store.ts
 import { create } from 'zustand';
 import { apiRequest, ApiError } from '@/api/client';
 import type {

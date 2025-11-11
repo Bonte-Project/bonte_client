@@ -53,6 +53,18 @@ export const Header = () => {
     { id: 'workouts', label: 'Workouts', icon: Dumbbell, href: '/workouts' },
   ];
 
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'bg-red-500/20 text-red-400 border-red-500/30';
+      case 'trainer':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      case 'user':
+      default:
+        return 'bg-[#D98A9D]/20 text-[#D98A9D] border-[#D98A9D]/30';
+    }
+  };
+
   return (
     <>
       {/* Mobile Menu Toggle Button */}
@@ -75,17 +87,42 @@ export const Header = () => {
           <div className='flex flex-col gap-4'>
             {/* User Section */}
             {user ? (
-              <div className='flex gap-3 items-center p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors'>
-                <div className='w-10 h-10 rounded-full bg-linear-to-br from-[#D98A9D] to-[#ec1380] flex items-center justify-center text-white font-bold text-lg'>
-                  {user.fullName ? user.fullName.charAt(0).toUpperCase() : '?'}
-                </div>
-                <div className='flex flex-col min-w-0'>
-                  <h1 className='text-white text-base font-medium leading-normal truncate'>
-                    {user.fullName || 'Unknown User'}
-                  </h1>
-                  <p className='text-[#b99dab] text-sm font-normal leading-normal truncate'>
-                    {user.email}
-                  </p>
+              <div className='flex flex-col gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors'>
+                <Link to='/profile'>
+                  <div className='flex gap-3 items-center'>
+                    {user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.fullName}
+                        className='w-10 h-10 rounded-full object-cover border-2 border-[#D98A9D]/30 shrink-0'
+                      />
+                    ) : (
+                      <div className='w-10 h-10 rounded-full bg-linear-to-br from-[#D98A9D] to-[#ec1380] flex items-center justify-center text-white font-bold text-lg shrink-0'>
+                        {user.fullName ? user.fullName.charAt(0).toUpperCase() : '?'}
+                      </div>
+                    )}
+                    <div className='flex flex-col min-w-0'>
+                      <h1 className='text-white text-base font-medium leading-normal truncate'>
+                        {user.fullName || 'Unknown User'}
+                      </h1>
+                      <p className='text-[#b99dab] text-sm font-normal leading-normal truncate'>
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+                {/* Role Badge and Premium Badge */}
+                <div className='flex gap-2 flex-wrap'>
+                  <span
+                    className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded border ${getRoleBadgeColor(user.role)}`}
+                  >
+                    {user.role}
+                  </span>
+                  {user.isPremium && (
+                    <span className='text-xs font-bold uppercase tracking-wider px-2 py-1 rounded border bg-amber-500/20 text-amber-400 border-amber-500/30 flex items-center gap-1'>
+                      ⭐ Premium
+                    </span>
+                  )}
                 </div>
               </div>
             ) : (
