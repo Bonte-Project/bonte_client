@@ -63,3 +63,8 @@ export interface RefreshResponse {
   message: string;
   accessToken: string;
 }
+
+export interface ForgotPasswordResponse {
+  message: string;
+  email: string;
+}
