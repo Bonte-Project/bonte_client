@@ -1,4 +1,3 @@
-// src\routes\__root.tsx
 import { createRootRoute, Outlet, redirect } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import Layout from '@/components/layout.component';
@@ -18,7 +17,7 @@ const RootLayout = () => {
 export const Route = createRootRoute({
   component: RootLayout,
   beforeLoad: async ({ location }) => {
-    const publicPaths = ['/login', '/register', '/verify-email'];
+    const publicPaths = ['/login', '/register', '/verify-email', '/forgot-password'];
     const isPublicPath = publicPaths.some(path => location.pathname.startsWith(path));
 
     const { user, fetchMe } = useAuthStore.getState();
