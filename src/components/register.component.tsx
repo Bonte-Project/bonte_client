@@ -27,10 +27,10 @@ interface FormErrors {
   general?: string;
 }
 
-interface GoogleCredentialResponse {
-  credential: string;
-}
-
+// interface GoogleCredentialResponse {
+//   credential: string;
+// }
+//
 export const RegisterForm = () => {
   const navigate = useNavigate();
   const { register, isLoading, error, clearError, loginWithGoogle } = useAuthStore();
@@ -165,25 +165,39 @@ export const RegisterForm = () => {
 
   const handleGoogleSuccess = (credentialResponse: unknown) => {
     void (async () => {
-      const response = credentialResponse as GoogleCredentialResponse;
-      const token = response?.credential;
-      if (!token) {
-        toastError('Google Authentication Failed', {
-          description: 'No token received from Google',
-        });
-        return;
-      }
-
       try {
-        const jwt = await loginWithGoogle(token);
-        if (jwt) {
-          localStorage.setItem('access_token', jwt);
-          success('Google Login Successful', {
-            description: 'Redirecting to dashboard...',
+        const response = credentialResponse as { credential?: string };
+        const idToken = response?.credential;
+
+        if (!idToken) {
+          toastError('Google Authentication Failed', {
+            description: 'No token received from Google',
           });
-          setTimeout(() => void navigate({ to: '/' }), 1500);
+          return;
+        }
+
+        if (!selectedRole) {
+          toastError('Role Required', {
+            description: 'Please select your role before signing in with Google',
+          });
+          return;
+        }
+
+        console.log('Google registration with role:', selectedRole);
+
+        const accessToken = await loginWithGoogle(idToken, selectedRole);
+
+        if (accessToken) {
+          success('Registration Successful!', {
+            description: 'Welcome to Bonté. Redirecting to dashboard...',
+          });
+
+          setTimeout(() => {
+            void navigate({ to: '/' });
+          }, 1500);
         }
       } catch (err) {
+        console.error('Google auth error:', err);
         const errorMessage = err instanceof Error ? err.message : 'Google authentication failed';
         toastError('Authentication Error', {
           description: errorMessage,
@@ -407,17 +421,16 @@ export const RegisterForm = () => {
 
             {/* Google Sign-Up */}
             <div className='w-full flex justify-center '>
-              <div className='w-full max-w-none'>
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={handleGoogleError}
-                  theme='outline'
-                  shape='pill'
-                  text='signup_with'
-                  width='100%'
-                  useOneTap
-                />
-              </div>
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                theme='outline'
+                shape='pill'
+                locale='en'
+                text='signup_with'
+                width='100%'
+                useOneTap
+              />
             </div>
 
             <p className='mt-8 text-center text-sm text-gray-400'>

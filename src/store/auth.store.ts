@@ -3,7 +3,6 @@ import { apiRequest, ApiError } from '@/api/client';
 import type {
   RegisterRequest,
   RegisterResponse,
-  GoogleAuthResponse,
   LoginRequest,
   LoginResponse,
   MeResponse,
@@ -31,7 +30,7 @@ interface AuthState {
   logout: () => void;
   fetchMe: () => Promise<void>;
   refreshToken: () => Promise<boolean>;
-  loginWithGoogle: (token: string) => Promise<string | null>;
+  loginWithGoogle: (idToken: string, role?: string) => Promise<string | null>;
   sendResetEmail: (email: string) => Promise<string | null>;
   verifyResetCode: (email: string, code: string) => Promise<boolean>;
   setResetEmail: (email: string | null) => void;
@@ -153,19 +152,36 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  loginWithGoogle: async (token: string) => {
+  loginWithGoogle: async (idToken: string, role?: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await apiRequest<GoogleAuthResponse>('/auth/google', {
+      console.log('Sending Google auth request with ID token and role:', role);
+
+      const response = await apiRequest<{
+        accessToken: string;
+        user: User;
+        isNewUser: boolean;
+        message: string;
+      }>('/auth/google', {
         method: 'POST',
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ idToken, role }),
       });
-      localStorage.setItem('token', response.token);
-      await get().fetchMe();
-      set({ isLoading: false });
-      return response.token;
+
+      console.log('Google auth response:', response.message);
+
+      // Сохранение access token
+      localStorage.setItem('token', response.accessToken);
+
+      set({
+        user: response.user,
+        token: response.accessToken,
+        isLoading: false,
+      });
+
+      return response.accessToken;
     } catch (error) {
       const message = error instanceof ApiError ? error.message : 'Google login failed';
+      console.error('Google login error:', message);
       set({ isLoading: false, error: message });
       return null;
     }

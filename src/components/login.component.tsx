@@ -21,10 +21,6 @@ interface FormErrors {
   general?: string;
 }
 
-interface GoogleCredentialResponse {
-  credential: string;
-}
-
 export const LoginForm = () => {
   const navigate = useNavigate();
   const { login, isLoading, error, clearError, loginWithGoogle } = useAuthStore();
@@ -136,36 +132,49 @@ export const LoginForm = () => {
 
   const handleGoogleSuccess = (credentialResponse: unknown) => {
     void (async () => {
-      const response = credentialResponse as GoogleCredentialResponse;
-      const token = response?.credential;
-      if (!token) {
-        toastError('Google Authentication Failed', {
-          description: 'No token received from Google',
-        });
-        return;
-      }
-
       try {
-        const jwt = await loginWithGoogle(token);
-        if (jwt) {
-          localStorage.setItem('access_token', jwt);
-          success('Google Login Successful', {
-            description: 'Redirecting to dashboard...',
+        const response = credentialResponse as { credential?: string };
+        const idToken = response?.credential;
+        if (!idToken) {
+          toastError('Google Authentication Failed', {
+            description: 'No token received from Google',
+          });
+          return;
+        }
+
+        const accessToken = await loginWithGoogle(idToken);
+
+        if (accessToken) {
+          success('Login Successful!', {
+            description: 'Welcome back to Bonté. Redirecting...',
           });
           setTimeout(() => void navigate({ to: '/' }), 1500);
         }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Google authentication failed';
-        toastError('Authentication Error', {
-          description: errorMessage,
-        });
+      } catch (err: any) {
+        console.error('Google login error:', err);
+
+        const errorMessage = err.message || 'Google authentication failed';
+
+        if (
+          errorMessage.includes('Account not found') ||
+          errorMessage.includes('Role is required')
+        ) {
+          toastError('Account Not Found', {
+            description: 'No account linked with this Google email. Please register first.',
+          });
+          setTimeout(() => void navigate({ to: '/register' }), 2000);
+        } else {
+          toastError('Authentication Error', {
+            description: errorMessage,
+          });
+        }
       }
     })();
   };
 
   const handleGoogleError = () => {
     warning('Google Authentication', {
-      description: 'An error occurred during Google sign-up. Please try again.',
+      description: 'An error occurred during Google login. Please try again.',
     });
   };
 
@@ -290,17 +299,16 @@ export const LoginForm = () => {
 
             {/* Google Sign-Up */}
             <div className='w-full flex justify-center '>
-              <div className='w-full max-w-none'>
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={handleGoogleError}
-                  theme='outline'
-                  shape='pill'
-                  text='signup_with'
-                  width='100%'
-                  useOneTap
-                />
-              </div>
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                theme='outline'
+                shape='pill'
+                locale='en'
+                text='signin_with'
+                width='100%'
+                useOneTap
+              />
             </div>
 
             <p className='mt-8 text-center text-sm text-gray-400'>
