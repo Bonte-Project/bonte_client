@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Upload } from 'lucide-react';
+import { X, Upload, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FormValidator } from '@/utils/form-validator.utils';
@@ -7,6 +7,7 @@ import { useUserStore } from '@/store/user.store';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
 import type { User } from '@/types/auth.types';
 import type { UpdateUserRequest } from '@/types/user.types';
+import { useAuthStore } from '@/store/auth.store';
 
 const avatarUploadDisabled = true;
 
@@ -23,14 +24,26 @@ interface FormErrors {
   height?: string;
   weight?: string;
   general?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+  subscription?: string;
 }
 
-type TabType = 'personal' | 'subscription';
+interface FormDataPasswordChange {
+  newPassword: string;
+  confirmPassword: string;
+}
+
+interface FormDataSubscription {
+  isPremium: boolean;
+}
+
+type TabType = 'personal' | 'subscription' | 'changePassword';
 
 export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditModalProps) => {
   const { updateUser, isLoading, error, clearError } = useUserStore();
-  const { error: toastError } = useCustomToast();
-
+  const { success, error: toastError } = useCustomToast();
+  const { resetPassword } = useAuthStore();
   const [activeTab, setActiveTab] = useState<TabType>('personal');
   const [formData, setFormData] = useState<UpdateUserRequest>({
     fullName: user.fullName,
@@ -39,11 +52,20 @@ export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditM
     weight: user.weight,
     avatarUrl: user.avatarUrl,
   });
+
+  const [formDataPasswordChange, setFormDataPasswordChange] = useState<FormDataPasswordChange>({
+    newPassword: '',
+    confirmPassword: '',
+  });
   const [avatarPreview, setAvatarPreview] = useState<string>(user.avatarUrl);
-  const [isPremium, setIsPremium] = useState(user.isPremium);
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Set<string>>(new Set());
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [subscriptionErrors, setSubscriptionErrors] = useState<{ general?: string }>({});
+  const [formDataSubscription, setFormDataSubscription] = useState<FormDataSubscription>({
+    isPremium: user.isPremium,
+  });
   useEffect(() => {
     clearError();
   }, [isOpen, clearError]);
@@ -57,7 +79,11 @@ export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditM
       validateField(field, value);
     }
   };
-
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    setErrors({});
+    setSubscriptionErrors({});
+  };
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -127,7 +153,6 @@ export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditM
         fieldError = 'Weight must be between 20 and 500 kg';
       }
     }
-
     setErrors(prev => ({
       ...prev,
       [field]: fieldError,
@@ -159,35 +184,129 @@ export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditM
     return Object.keys(newErrors).length === 0;
   };
 
+  const validateFieldChangePassword = (field: string, value: string) => {
+    let fieldError: string | undefined;
+
+    if (field === 'newPassword') {
+      fieldError = FormValidator.validatePassword(String(value));
+    } else if (field === 'confirmPassword') {
+      fieldError = FormValidator.validatePasswordMatch(formDataPasswordChange.newPassword, value);
+    }
+
+    setErrors(prev => ({ ...prev, [field]: fieldError }));
+  };
+
+  const validateFormChangePassword = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    const passwordError = FormValidator.validatePassword(formDataPasswordChange.newPassword);
+    if (passwordError) newErrors.newPassword = passwordError;
+
+    const confirmPasswordError = FormValidator.validatePasswordMatch(
+      formDataPasswordChange.newPassword,
+      formDataPasswordChange.confirmPassword
+    );
+    if (confirmPasswordError) newErrors.confirmPassword = confirmPasswordError;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateFormSubscription = (): boolean => {
+    const newErrors: { general?: string } = {};
+
+    // TODO
+
+    setSubscriptionErrors(newErrors);
+    return true;
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    if (activeTab === 'personal' && !validateForm()) {
+      return;
+    }
+    if (activeTab === 'changePassword' && !validateFormChangePassword()) {
+      return;
+    }
+    if (activeTab === 'subscription' && !validateFormSubscription()) {
       return;
     }
 
     void (async () => {
-      const success = await updateUser(formData);
+      switch (activeTab) {
+        case 'personal': {
+          const success = await updateUser(formData);
+          if (success) {
+            const updatedUser: User = {
+              ...user,
+              fullName: formData.fullName || user.fullName,
+              age: formData.age || user.age,
+              height: formData.height || user.height,
+              weight: formData.weight || user.weight,
+              avatarUrl: formData.avatarUrl || user.avatarUrl,
+              isPremium: formDataSubscription.isPremium,
+            };
+            onSave(updatedUser);
+          } else {
+            setErrors(prev => ({
+              ...prev,
+              general: error || 'Failed to save profile',
+            }));
+            toastError('Update Failed', {
+              description: error || 'Failed to save your profile',
+            });
+          }
+          break;
+        }
+        case 'changePassword': {
+          const email = user.email;
+          const passwordSuccess = await resetPassword(email, formDataPasswordChange.newPassword);
+          if (passwordSuccess) {
+            setFormDataPasswordChange({
+              newPassword: '',
+              confirmPassword: '',
+            });
+            setErrors({});
+            setTouched(new Set());
+            success('Success', {
+              description: 'Your password has been changed successfully',
+            });
+          } else {
+            setErrors(prev => ({
+              ...prev,
+              general: error || 'Failed to change password',
+            }));
+            toastError('Password update failed', {
+              description: error || 'Failed to change your password',
+            });
+          }
+          break;
+        }
+        case 'subscription': {
+          if (!validateFormSubscription()) {
+            return;
+          }
 
-      if (success) {
-        const updatedUser: User = {
-          ...user,
-          fullName: formData.fullName || user.fullName,
-          age: formData.age || user.age,
-          height: formData.height || user.height,
-          weight: formData.weight || user.weight,
-          avatarUrl: formData.avatarUrl || user.avatarUrl,
-          isPremium,
-        };
-        onSave(updatedUser);
-      } else {
-        setErrors(prev => ({
-          ...prev,
-          general: error || 'Failed to save profile',
-        }));
-        toastError('Update Failed', {
-          description: error || 'Failed to save your profile',
-        });
+          // const subscriptionSuccess = await updateSubscription(user.id, formDataSubscription.isPremium);
+
+          // if (subscriptionSuccess) {
+          //   const updatedUserWithSubscription: User = {
+          //     ...user,
+          //     isPremium: formDataSubscription.isPremium,
+          //   };
+          //   onSave(updatedUserWithSubscription);
+          // } else {
+          //   setSubscriptionErrors({
+          //     general: 'Failed to update subscription',
+          //   });
+          //   toastError('Update Failed', {
+          //     description: 'Failed to update subscription',
+          //   });
+          // }
+          break;
+        }
       }
     })();
   };
@@ -222,7 +341,7 @@ export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditM
             {/* Tabs */}
             <div className='mt-8 flex border-b border-white/10'>
               <button
-                onClick={() => setActiveTab('personal')}
+                onClick={() => handleTabChange('personal')}
                 className={`border-b-2 px-4 py-3 text-sm font-bold transition-colors ${
                   activeTab === 'personal'
                     ? 'border-[#D98A9D] text-white'
@@ -233,7 +352,7 @@ export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditM
                 Personal Info
               </button>
               <button
-                onClick={() => setActiveTab('subscription')}
+                onClick={() => handleTabChange('subscription')}
                 className={`border-b-2 px-4 py-3 text-sm font-bold transition-colors ${
                   activeTab === 'subscription'
                     ? 'border-[#D98A9D] text-white'
@@ -242,6 +361,17 @@ export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditM
                 type='button'
               >
                 Subscription
+              </button>
+              <button
+                onClick={() => handleTabChange('changePassword')}
+                className={`border-b-2 px-4 py-3 text-sm font-bold transition-colors ${
+                  activeTab === 'changePassword'
+                    ? 'border-[#D98A9D] text-white'
+                    : 'border-transparent text-gray-400 hover:text-gray-200'
+                }`}
+                type='button'
+              >
+                Change password
               </button>
             </div>
 
@@ -462,8 +592,13 @@ export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditM
                     <label className='flex cursor-pointer items-start gap-4'>
                       <input
                         type='checkbox'
-                        checked={isPremium}
-                        onChange={e => setIsPremium(e.target.checked)}
+                        checked={formDataSubscription.isPremium}
+                        onChange={e =>
+                          setFormDataSubscription(prev => ({
+                            ...prev,
+                            isPremium: e.target.checked,
+                          }))
+                        }
                         disabled={isLoading}
                         className='mt-1 h-5 w-5 cursor-pointer rounded border border-[#D98A9D]/40 bg-[#141414] accent-[#D98A9D] transition-colors hover:border-[#D98A9D]/60 disabled:opacity-50 disabled:cursor-not-allowed'
                       />
@@ -475,14 +610,146 @@ export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditM
                       </div>
                     </label>
                   </div>
+
+                  {/* Info about coming soon features */}
                   <div className='rounded-lg border border-white/10 bg-[#D98A9D]/5 p-4'>
                     <p className='text-xs font-medium text-gray-300'>
-                      ℹ️ Premium features coming soon
+                      ℹ️ Premium subscription management coming soon
                     </p>
                     <p className='mt-2 text-xs text-gray-400'>
-                      This is a placeholder for future implementation. Premium features will provide
-                      enhanced capabilities and personalized support.
+                      Subscription features and billing management will be available in an upcoming
+                      update. The checkbox below is for future use.
                     </p>
+                  </div>
+
+                  {/* Subscription Error */}
+                  {subscriptionErrors.general && (
+                    <div className='rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400'>
+                      {subscriptionErrors.general}
+                    </div>
+                  )}
+                </div>
+              )}
+              {/* Password changing Tab */}
+              {activeTab === 'changePassword' && (
+                <div className='space-y-6'>
+                  <div className='flex flex-col'>
+                    <label
+                      htmlFor='email'
+                      className='pb-2 text-base font-medium leading-normal text-white'
+                    >
+                      Email Address
+                    </label>
+                    <Input
+                      id='email'
+                      type='email'
+                      value={user.email}
+                      disabled
+                      className='h-14 w-full resize-none overflow-hidden rounded-lg border border-white/10 bg-[#141414]/60 p-[15px] text-base font-normal leading-normal text-gray-500 cursor-not-allowed'
+                    />
+                    <p className='mt-1 text-xs text-gray-500'>Email cannot be changed</p>
+                  </div>
+                  {/* Password Field */}
+                  <div className='flex flex-col'>
+                    <label
+                      htmlFor='newPassword'
+                      className='pb-2 text-base font-medium leading-normal text-white'
+                    >
+                      New Password
+                    </label>
+                    <div className='relative'>
+                      <Input
+                        id='newPassword'
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder='Enter new password'
+                        value={formDataPasswordChange.newPassword}
+                        onChange={e => {
+                          setFormDataPasswordChange(prev => ({
+                            ...prev,
+                            newPassword: e.target.value,
+                          }));
+                          validateFieldChangePassword('newPassword', e.target.value);
+                        }}
+                        onBlur={() => {
+                          setTouched(prev => new Set([...prev, 'newPassword']));
+                          validateFieldChangePassword(
+                            'newPassword',
+                            formDataPasswordChange.newPassword
+                          );
+                        }}
+                        disabled={isLoading}
+                        className={`h-14 w-full resize-none overflow-hidden rounded-lg border bg-[#141414] p-[15px] pr-12 text-base font-normal leading-normal text-white placeholder:text-gray-500 transition-shadow duration-300 focus:outline-0 focus:ring-2
+                                            ${
+                                              errors.newPassword && touched.has('newPassword')
+                                                ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/40'
+                                                : 'border-white/10 focus:border-[#D98A9D]/80 focus:ring-[#D98A9D]/40'
+                                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      />
+                      <button
+                        type='button'
+                        onClick={() => setShowPassword(!showPassword)}
+                        disabled={isLoading}
+                        className='absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-500 hover:text-white transition-colors p-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                    {errors.newPassword && touched.has('newPassword') && (
+                      <span className='mt-1 text-xs text-red-400'>{errors.newPassword}</span>
+                    )}
+                  </div>
+
+                  {/* Confirm Password Field */}
+                  <div className='flex flex-col'>
+                    <label
+                      htmlFor='confirmPassword'
+                      className='pb-2 text-base font-medium leading-normal text-white'
+                    >
+                      Confirm Password
+                    </label>
+                    <div className='relative'>
+                      <Input
+                        id='confirmPassword'
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        placeholder='Confirm new password'
+                        value={formDataPasswordChange.confirmPassword}
+                        onChange={e => {
+                          setFormDataPasswordChange(prev => ({
+                            ...prev,
+                            confirmPassword: e.target.value,
+                          }));
+                          validateFieldChangePassword('confirmPassword', e.target.value);
+                        }}
+                        onBlur={() => {
+                          setTouched(prev => new Set([...prev, 'confirmPassword']));
+                          validateFieldChangePassword(
+                            'confirmPassword',
+                            formDataPasswordChange.confirmPassword
+                          );
+                        }}
+                        disabled={isLoading}
+                        className={`h-14 w-full resize-none overflow-hidden rounded-lg border bg-[#141414] p-[15px] pr-12 text-base font-normal leading-normal text-white placeholder:text-gray-500 transition-shadow duration-300 focus:outline-0 focus:ring-2
+                                            ${
+                                              errors.confirmPassword &&
+                                              touched.has('confirmPassword')
+                                                ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/40'
+                                                : 'border-white/10 focus:border-[#D98A9D]/80 focus:ring-[#D98A9D]/40'
+                                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      />
+                      <button
+                        type='button'
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        disabled={isLoading}
+                        className='absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-500 hover:text-white transition-colors p-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                        aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                    {errors.confirmPassword && touched.has('confirmPassword') && (
+                      <span className='mt-1 text-xs text-red-400'>{errors.confirmPassword}</span>
+                    )}
                   </div>
                 </div>
               )}
@@ -535,7 +802,7 @@ export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditM
                   {formData.fullName}
                 </h2>
                 <span className='mt-3 inline-block rounded-full bg-[#D98A9D]/20 px-4 py-1 text-xs font-bold uppercase tracking-wider text-[#D98A9D] border border-[#D98A9D]/30'>
-                  {isPremium ? 'Premium User' : 'Regular User'}
+                  {formDataSubscription.isPremium ? 'Premium User' : 'Regular User'}
                 </span>
 
                 <div className='mt-8 w-full grid grid-cols-3 gap-4 border-t border-white/10 pt-8'>

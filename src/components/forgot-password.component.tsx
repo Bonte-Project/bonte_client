@@ -147,20 +147,20 @@ export const ForgotPasswordForm = () => {
     const newErrors: FormErrors = {};
 
     switch (currentStep) {
-      case STEPS.EMAIL:
+      case STEPS.EMAIL: {
         const emailError = FormValidator.validateEmail(formData.email);
         if (emailError) newErrors.email = emailError;
         break;
-
-      case STEPS.CODE:
+      }
+      case STEPS.CODE: {
         if (!formData.code.trim()) {
           newErrors.code = 'Verification code is required';
         } else if (!/^\d{4}$/.test(formData.code.trim())) {
           newErrors.code = 'Code must be exactly 4 digits';
         }
         break;
-
-      case STEPS.PASSWORD:
+      }
+      case STEPS.PASSWORD: {
         const passwordError = FormValidator.validatePassword(formData.password);
         if (passwordError) newErrors.password = passwordError;
 
@@ -170,6 +170,7 @@ export const ForgotPasswordForm = () => {
           newErrors.confirmPassword = 'Passwords do not match';
         }
         break;
+      }
     }
 
     setErrors(newErrors);
