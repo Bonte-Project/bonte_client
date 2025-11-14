@@ -68,3 +68,14 @@ export interface ForgotPasswordResponse {
   message: string;
   email: string;
 }
+
+export interface GoogleAuthResponse {
+  accessToken: string;
+  user: User;
+  isNewUser: boolean;
+}
+
+export interface GoogleAuthRequest {
+  code: string;
+  role: UserRole;
+}
