@@ -65,6 +65,7 @@ export default tseslint.config(
       'react/prop-types': 'off',
       'react/require-default-props': 'off',
       'react/jsx-filename-extension': ['warn', { extensions: ['.tsx', '.jsx'] }],
+      'react/no-unescaped-entities': 'off',
     },
   },
 
