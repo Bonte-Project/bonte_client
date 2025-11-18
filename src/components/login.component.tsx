@@ -183,7 +183,7 @@ export const LoginForm = () => {
       <div className='grid w-full max-w-6xl grid-cols-1 items-center gap-16 lg:grid-cols-2'>
         {/* Form Section */}
         <div className='flex flex-col justify-center'>
-          <div className='bg-black/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl shadow-[#D98A9D]/5'>
+          <div className='bg-black/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl shadow-primary-button/5'>
             <div className='mb-8'>
               <h1 className='text-4xl font-black leading-tight tracking-tight text-white'>
                 Welcome Back to Bonté
@@ -214,7 +214,7 @@ export const LoginForm = () => {
                       ${
                         errors.email && touched.has('email')
                           ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/40'
-                          : 'border-white/10 focus:border-[#D98A9D]/80 focus:ring-[#D98A9D]/40'
+                          : 'border-white/10 focus:border-primary-button/80 focus:ring-primary-button/40'
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
                 />
                 {errors.email && touched.has('email') && (
@@ -282,7 +282,7 @@ export const LoginForm = () => {
               <Button
                 type='submit'
                 disabled={isLoading}
-                className='w-full transform rounded-lg bg-[#D98A9D] py-5 text-base font-bold text-white shadow-lg shadow-[#D98A9D]/20 transition-all duration-300 ease-in-out hover:bg-[#c87b8f] hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-[#D98A9D]/50 disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100'
+                className='w-full transform rounded-lg bg-primary-button py-5 text-base font-bold text-white shadow-lg shadow-primary-button/20 transition-all duration-300 ease-in-out hover:bg-[#c87b8f] hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-primary-button/50 disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100'
               >
                 {isLoading ? 'Logging in...' : 'Log In'}
               </Button>
