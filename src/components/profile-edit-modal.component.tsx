@@ -132,27 +132,13 @@ export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditM
     if (field === 'fullName') {
       fieldError = FormValidator.validateFullName(String(value));
     } else if (field === 'age') {
-      const age = Number(value);
-      if (!age) {
-        fieldError = 'Age is required';
-      } else if (age < 13 || age > 120) {
-        fieldError = 'Age must be between 13 and 120';
-      }
+      fieldError = FormValidator.validateAge(Number(value));
     } else if (field === 'height') {
-      const height = Number(value);
-      if (!height) {
-        fieldError = 'Height is required';
-      } else if (height < 50 || height > 300) {
-        fieldError = 'Height must be between 50 and 300 cm';
-      }
+      fieldError = FormValidator.validateHeight(Number(value));
     } else if (field === 'weight') {
-      const weight = Number(value);
-      if (!weight) {
-        fieldError = 'Weight is required';
-      } else if (weight < 20 || weight > 500) {
-        fieldError = 'Weight must be between 20 and 500 kg';
-      }
+      fieldError = FormValidator.validateWeight(Number(value));
     }
+
     setErrors(prev => ({
       ...prev,
       [field]: fieldError,
@@ -165,20 +151,14 @@ export const ProfileEditModal = ({ isOpen, user, onClose, onSave }: ProfileEditM
     const fullNameError = FormValidator.validateFullName(String(formData.fullName));
     if (fullNameError) newErrors.fullName = fullNameError;
 
-    const age = Number(formData.age);
-    if (!age || age < 13 || age > 120) {
-      newErrors.age = 'Age must be between 13 and 120';
-    }
+    const ageError = FormValidator.validateAge(Number(formData.age));
+    if (ageError) newErrors.age = ageError;
 
-    const height = Number(formData.height);
-    if (!height || height < 50 || height > 300) {
-      newErrors.height = 'Height must be between 50 and 300 cm';
-    }
+    const heightError = FormValidator.validateHeight(Number(formData.height));
+    if (heightError) newErrors.height = heightError;
 
-    const weight = Number(formData.weight);
-    if (!weight || weight < 20 || weight > 500) {
-      newErrors.weight = 'Weight must be between 20 and 500 kg';
-    }
+    const weightError = FormValidator.validateWeight(Number(formData.weight));
+    if (weightError) newErrors.weight = weightError;
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

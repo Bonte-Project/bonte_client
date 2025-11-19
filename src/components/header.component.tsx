@@ -13,6 +13,7 @@ import {
   Settings,
   HelpCircle,
   Sparkles,
+  User,
 } from 'lucide-react';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
 import { useAuthStore } from '@/store/auth.store';
@@ -53,6 +54,11 @@ export const Header = () => {
     { id: 'workouts', label: 'Workouts', icon: Dumbbell, href: '/workouts' },
   ];
 
+  const trainerNavItems = [
+    { id: 'trainer-profile', label: 'My Profile', icon: User, href: '/trainer-profile' },
+    { id: 'clients', label: 'Clients', icon: Dumbbell, href: '/trainer/clients' },
+  ];
+
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'admin':
@@ -64,6 +70,8 @@ export const Header = () => {
         return 'bg-[#D98A9D]/20 text-[#D98A9D] border-[#D98A9D]/30';
     }
   };
+
+  const isTrainer = user?.role === 'trainer';
 
   return (
     <>
@@ -88,7 +96,7 @@ export const Header = () => {
             {/* User Section */}
             {user ? (
               <div className='flex flex-col gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors'>
-                <Link to='/profile'>
+                <Link to={isTrainer ? '/trainer-profile' : '/profile'}>
                   <div className='flex gap-3 items-center'>
                     {user.avatarUrl ? (
                       <img
@@ -150,6 +158,28 @@ export const Header = () => {
 
             {/* Navigation Menu */}
             <nav className='flex flex-col gap-1'>
+              {/* Trainer-specific navigation */}
+              {isTrainer && (
+                <>
+                  {trainerNavItems.map(item => {
+                    const Icon = item.icon;
+                    return (
+                      <Link key={item.id} to={item.href} onClick={closeMobileMenu}>
+                        <Button
+                          variant='ghost'
+                          className='w-full justify-start text-white hover:bg-white/10 hover:text-[#D98A9D] transition-colors'
+                        >
+                          <Icon size={20} className='mr-3 text-[#D98A9D]' />
+                          {item.label}
+                        </Button>
+                      </Link>
+                    );
+                  })}
+                  <div className='border-t border-white/10 my-2'></div>
+                </>
+              )}
+
+              {/* Regular user navigation */}
               {navItems.map(item => {
                 const Icon = item.icon;
                 return (
@@ -189,8 +219,8 @@ export const Header = () => {
 
           {/* Bottom Section */}
           <div className='flex flex-col gap-4'>
-            {/* Log Workout Button - Only for authorized users */}
-            {user && (
+            {/* Log Workout Button - Only for regular users */}
+            {user && !isTrainer && (
               <Link to='/'>
                 <Button
                   className='w-full bg-[#D98A9D] hover:bg-[#c87b8f] text-white'

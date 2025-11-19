@@ -49,7 +49,7 @@ export const ProfileComponent = ({ user, onProfileUpdate }: ProfileComponentProp
 
       <main className='relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12'>
         {/* Profile Header Card */}
-        <div className='mb-8 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-md p-8 shadow-2xl shadow-[#D98A9D]/5 lg:p-10'>
+        <div className='mb-8 rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-8 shadow-2xl shadow-[#D98A9D]/5 lg:p-10'>
           <div className='flex flex-col items-center gap-6 lg:flex-row lg:justify-between lg:items-start'>
             <div className='flex flex-col items-center gap-4 lg:flex-row lg:gap-6'>
               <div className='relative'>
@@ -110,7 +110,7 @@ export const ProfileComponent = ({ user, onProfileUpdate }: ProfileComponentProp
         {/* Features Grid */}
         <div className='grid gap-6 lg:grid-cols-3 mb-8'>
           {/* Nutrition */}
-          <div className='group relative rounded-2xl border border-white/10 bg-black/80 backdrop-blur-md p-8 shadow-lg transition-all duration-300 hover:border-[#D98A9D]/30 hover:shadow-xl hover:shadow-[#D98A9D]/10'>
+          <div className='group relative rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-8 shadow-lg transition-all duration-300 hover:border-[#D98A9D]/30 hover:shadow-xl hover:shadow-[#D98A9D]/10'>
             <div className='flex items-start justify-between'>
               <div className='flex-1'>
                 <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-[#D98A9D]/10 text-[#D98A9D] mb-4'>
@@ -132,7 +132,7 @@ export const ProfileComponent = ({ user, onProfileUpdate }: ProfileComponentProp
           </div>
 
           {/* Sleep */}
-          <div className='group relative rounded-2xl border border-white/10 bg-black/80 backdrop-blur-md p-8 shadow-lg transition-all duration-300 hover:border-[#D98A9D]/30 hover:shadow-xl hover:shadow-[#D98A9D]/10'>
+          <div className='group relative rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-8 shadow-lg transition-all duration-300 hover:border-[#D98A9D]/30 hover:shadow-xl hover:shadow-[#D98A9D]/10'>
             <div className='flex items-start justify-between'>
               <div className='flex-1'>
                 <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-[#D98A9D]/10 text-[#D98A9D] mb-4'>
@@ -154,7 +154,7 @@ export const ProfileComponent = ({ user, onProfileUpdate }: ProfileComponentProp
           </div>
 
           {/* Activity */}
-          <div className='group relative rounded-2xl border border-white/10 bg-black/80 backdrop-blur-md p-8 shadow-lg transition-all duration-300 hover:border-[#D98A9D]/30 hover:shadow-xl hover:shadow-[#D98A9D]/10'>
+          <div className='group relative rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-8 shadow-lg transition-all duration-300 hover:border-[#D98A9D]/30 hover:shadow-xl hover:shadow-[#D98A9D]/10'>
             <div className='flex items-start justify-between'>
               <div className='flex-1'>
                 <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-[#D98A9D]/10 text-[#D98A9D] mb-4'>
@@ -177,7 +177,7 @@ export const ProfileComponent = ({ user, onProfileUpdate }: ProfileComponentProp
         </div>
 
         {/* Trainer Communication */}
-        <div className='mb-8 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-md p-8 shadow-lg lg:p-10'>
+        <div className='mb-8 rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-8 shadow-lg lg:p-10'>
           <div className='flex items-start justify-between gap-6 lg:flex-row flex-col'>
             <div>
               <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-[#D98A9D]/10 text-[#D98A9D] mb-4'>

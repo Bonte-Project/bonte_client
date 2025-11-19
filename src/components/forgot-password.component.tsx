@@ -238,7 +238,7 @@ export const ForgotPasswordForm = () => {
     <AuthLayout>
       <div className='grid w-full max-w-6xl grid-cols-1 items-center gap-16 lg:grid-cols-2'>
         <div className='flex flex-col justify-center'>
-          <div className='bg-black/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl shadow-[#D98A9D]/5'>
+          <div className='bg-[#181114] backdrop-blur-md rounded-2xl p-8 shadow-2xl shadow-[#D98A9D]/5'>
             <div className='mb-8'>
               <h1 className='text-4xl font-black leading-tight tracking-tight text-white'>
                 {config.title}

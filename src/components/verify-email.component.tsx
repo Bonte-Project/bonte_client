@@ -135,7 +135,7 @@ export const VerifyEmailForm = () => {
         <div className='grid w-full max-w-6xl grid-cols-1 items-center gap-16 lg:grid-cols-2'>
           {/* Form Section */}
           <div className='flex flex-col justify-center'>
-            <div className='bg-black/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl shadow-[#D98A9D]/5'>
+            <div className='bg-[#181114] backdrop-blur-md rounded-2xl p-8 shadow-2xl shadow-[#D98A9D]/5'>
               <div className='mb-8'>
                 <h1 className='text-4xl font-black leading-tight tracking-tight text-white'>
                   Verify Your Email
@@ -207,7 +207,7 @@ export const VerifyEmailForm = () => {
             </div>
           </div>
 
-          {/* Right Side - Features (hidden on mobile) */}
+          {/* Right Side - Features */}
           <div className='hidden flex-col items-start justify-center text-white lg:flex'>
             <h2 className='text-6xl font-black leading-tight tracking-tight'>
               Your Health,

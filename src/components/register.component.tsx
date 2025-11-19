@@ -27,10 +27,6 @@ interface FormErrors {
   general?: string;
 }
 
-// interface GoogleCredentialResponse {
-//   credential: string;
-// }
-//
 export const RegisterForm = () => {
   const navigate = useNavigate();
   const { register, isLoading, error, clearError, loginWithGoogle } = useAuthStore();
@@ -137,16 +133,6 @@ export const RegisterForm = () => {
         return;
       }
 
-      console.log(
-        'Register payload (JSON):',
-        JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-          role: selectedRole,
-        })
-      );
-
       const successResult = await register({
         fullName: formData.fullName,
         email: formData.email,
@@ -217,7 +203,7 @@ export const RegisterForm = () => {
       <div className='grid w-full max-w-6xl grid-cols-1 items-center gap-16 lg:grid-cols-2'>
         {/* Form Section */}
         <div className='flex flex-col justify-center'>
-          <div className='bg-black/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl shadow-[#D98A9D]/5'>
+          <div className='bg-[#181114] backdrop-blur-md rounded-2xl p-8 shadow-2xl shadow-[#D98A9D]/5'>
             <div className='mb-8'>
               <h1 className='text-4xl font-black leading-tight tracking-tight text-white'>
                 Create Your Bonté Account

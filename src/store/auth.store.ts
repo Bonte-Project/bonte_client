@@ -9,6 +9,7 @@ import type {
   User,
   RefreshResponse,
   ForgotPasswordResponse,
+  UserRole,
 } from '@/types/auth.types';
 
 interface AuthState {
@@ -18,6 +19,7 @@ interface AuthState {
   token: string | null;
   registeredEmail: string | null;
   registeredEmailCode: string | null;
+  registeredRole: UserRole | null;
   resetCode: string | null;
   resetEmail: string | null;
 
@@ -30,7 +32,7 @@ interface AuthState {
   logout: () => void;
   fetchMe: () => Promise<void>;
   refreshToken: () => Promise<boolean>;
-  loginWithGoogle: (idToken: string, role?: string) => Promise<string | null>;
+  loginWithGoogle: (idToken: string, role?: UserRole) => Promise<string | null>;
   sendResetEmail: (email: string) => Promise<string | null>;
   verifyResetCode: (email: string, code: string) => Promise<boolean>;
   setResetEmail: (email: string | null) => void;
@@ -45,6 +47,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   token: localStorage.getItem('token'),
   registeredEmail: null,
   registeredEmailCode: null,
+  registeredRole: null,
   resetCode: null,
   resetEmail: null,
 
@@ -58,6 +61,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({
         isLoading: false,
         registeredEmail: response.email,
+        registeredRole: data.role,
       });
       return true;
     } catch (error) {
@@ -73,7 +77,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   verifyEmail: async () => {
     set({ isLoading: true, error: null });
-    const { registeredEmail, registeredEmailCode } = get();
+    const { registeredEmail, registeredEmailCode, registeredRole } = get();
     if (!registeredEmail || !registeredEmailCode) {
       set({ isLoading: false, error: 'Missing email or verification code' });
       return false;
@@ -83,10 +87,37 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         method: 'POST',
         body: JSON.stringify({ email: registeredEmail, code: registeredEmailCode }),
       });
+
+      if (registeredRole === 'trainer') {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const emptyTrainerProfile = {
+            bio: '',
+            certification: JSON.stringify([]),
+            specialization: '',
+            location: '',
+            experience: [],
+          };
+
+          try {
+            await apiRequest('/trainers', {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(emptyTrainerProfile),
+            });
+          } catch (trainerError) {
+            console.error('Failed to create trainer profile:', trainerError);
+          }
+        }
+      }
+
       set({
         isLoading: false,
         registeredEmail: null,
         registeredEmailCode: null,
+        registeredRole: null,
       });
       return true;
     } catch (error) {
@@ -103,7 +134,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         method: 'POST',
         body: JSON.stringify(data),
       });
-      console.log('Access token:', response.accessToken);
       localStorage.setItem('token', response.accessToken);
 
       await get().fetchMe();
@@ -125,7 +155,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   fetchMe: async () => {
     try {
       const token = localStorage.getItem('token');
-      console.log('Access token fetchMe:', token);
       if (!token) return;
       const response = await apiRequest<MeResponse>('/users/me', {
         headers: { Authorization: `Bearer ${token}` },
@@ -152,7 +181,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  loginWithGoogle: async (idToken: string, role?: string) => {
+  loginWithGoogle: async (idToken: string, role?: UserRole) => {
     set({ isLoading: true, error: null });
     try {
       console.log('Sending Google auth request with ID token and role:', role);
@@ -169,8 +198,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       console.log('Google auth response:', response.message);
 
-      // Сохранение access token
       localStorage.setItem('token', response.accessToken);
+
+      if (response.isNewUser && role === 'trainer') {
+        const emptyTrainerProfile = {
+          bio: '',
+          certification: JSON.stringify([]),
+          specialization: '',
+          location: '',
+          experience: [],
+        };
+
+        try {
+          await apiRequest('/trainers', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${response.accessToken}`,
+            },
+            body: JSON.stringify(emptyTrainerProfile),
+          });
+        } catch (trainerError) {
+          console.error('Failed to create trainer profile:', trainerError);
+        }
+      }
 
       set({
         user: response.user,
@@ -250,6 +300,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       isLoading: false,
       error: null,
       registeredEmail: null,
+      registeredRole: null,
       resetEmail: null,
       resetCode: null,
     }),

@@ -2,9 +2,9 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useNavigate } from '@tanstack/react-router';
 import { useAuthStore } from '@/store/auth.store';
 import { useEffect } from 'react';
-import ProfilePage from '@/pages/profile.page';
+import TrainerProfilePage from '@/pages/trainer-profile.page';
 
-export const Route = createFileRoute('/profile')({
+export const Route = createFileRoute('/trainer-profile')({
   component: RouteComponent,
 });
 
@@ -22,16 +22,16 @@ function RouteComponent() {
       case 'admin':
         void navigate({ to: '/' });
         break;
-      case 'trainer':
-        void navigate({ to: '/trainer-profile' });
+      case 'user':
+        void navigate({ to: '/profile' });
         break;
     }
   }, [user, navigate]);
 
   if (!user) return null;
 
-  if (user.role === 'user') {
-    return <ProfilePage />;
+  if (user.role === 'trainer') {
+    return <TrainerProfilePage />;
   }
 
   return null;
