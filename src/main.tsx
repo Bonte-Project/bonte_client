@@ -1,5 +1,3 @@
-// src\main.tsx
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -21,11 +19,9 @@ if (rootElement && !rootElement.innerHTML) {
   const root = createRoot(rootElement);
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
   root.render(
-    <StrictMode>
-      <GoogleOAuthProvider clientId={googleClientId}>
-        <Toaster />
-        <RouterProvider router={router} />
-      </GoogleOAuthProvider>
-    </StrictMode>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <Toaster />
+      <RouterProvider router={router} />
+    </GoogleOAuthProvider>
   );
 }

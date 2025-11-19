@@ -51,7 +51,7 @@ export const Header = () => {
     { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/dashboard' },
     { id: 'trends', label: 'Trends', icon: TrendingUp, href: '/trends' },
     { id: 'nutrition', label: 'Nutrition', icon: UtensilsCrossed, href: '/nutrition' },
-    { id: 'workouts', label: 'Workouts', icon: Dumbbell, href: '/workouts' },
+    { id: 'activity', label: 'Activity', icon: Dumbbell, href: '/activity' },
   ];
 
   const trainerNavItems = [

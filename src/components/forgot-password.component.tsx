@@ -409,7 +409,7 @@ export const ForgotPasswordForm = () => {
                   <Button
                     type='submit'
                     disabled={isLoading}
-                    className='w-full transform rounded-lg bg-[#D98A9D] py-5 text-base font-bold text-white shadow-lg shadow-[#D98A9D]/20 transition-all duration-300 ease-in-out hover:bg-[#c87b8f] hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-[#D98A9D]/50 disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100'
+                    className='w-full transform rounded-lg bg-primary-button py-5 text-base font-bold text-white shadow-lg shadow-primary-button/20 transition-all duration-300 ease-in-out hover:bg-[#c87b8f] hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-primary-button/50 disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100'
                   >
                     {isLoading ? 'Resetting...' : config.buttonText}
                   </Button>
@@ -419,7 +419,7 @@ export const ForgotPasswordForm = () => {
               {currentStep === STEPS.SUCCESS && (
                 <Button
                   type='submit'
-                  className='w-full transform rounded-lg bg-[#D98A9D] py-5 text-base font-bold text-white shadow-lg shadow-[#D98A9D]/20 transition-all duration-300 ease-in-out hover:bg-[#c87b8f] hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-[#D98A9D]/50'
+                  className='w-full transform rounded-lg bg-primary-button py-5 text-base font-bold text-white shadow-lg shadow-primary-button/20 transition-all duration-300 ease-in-out hover:bg-[#c87b8f] hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-primary-button/50'
                 >
                   {config.buttonText}
                 </Button>
