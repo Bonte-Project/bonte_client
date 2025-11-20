@@ -120,8 +120,8 @@ export const NutritionGoal = ({ data }: { data: NutritionData }) => {
           </div>
         </div>
 
-        <div className='relative w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 mx-auto lg:mx-0'>
-          <svg className='w-full h-full transform -rotate-90'>
+        <div className='relative w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 mx-auto lg:mx-0 flex items-center justify-center'>
+          <svg className='w-full h-full transform -rotate-90' viewBox='0 0 160 160'>
             <circle
               cx='50%'
               cy='50%'

@@ -16,12 +16,16 @@ export const AddActivityModal = ({ isOpen, onClose, onAdd }: AddActivityModalPro
   const [activityType, setActivityType] = useState('');
   const [intensity, setIntensity] = useState<'Low' | 'Medium' | 'High'>('Medium');
   const [duration, setDuration] = useState('');
+  const [isNow, setIsNow] = useState(true);
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [time, setTime] = useState(new Date().toTimeString().slice(0, 5));
   const [isLoading, setIsLoading] = useState(false);
 
   const [errors, setErrors] = useState({
     activityType: '',
     duration: '',
     intensity: '',
+    dateTime: '',
   });
 
   if (!isOpen) return null;
@@ -31,7 +35,15 @@ export const AddActivityModal = ({ isOpen, onClose, onAdd }: AddActivityModalPro
       activityType: FormValidator.validateActivityType(activityType) || '',
       duration: FormValidator.validateActivityDuration(duration) || '',
       intensity: FormValidator.validateActivityIntensity(intensity) || '',
+      dateTime: '',
     };
+
+    if (!isNow) {
+      const dateTime = new Date(`${date}T${time}`);
+      if (isNaN(dateTime.getTime())) {
+        newErrors.dateTime = 'Invalid date or time';
+      }
+    }
 
     setErrors(newErrors);
     return !Object.values(newErrors).some(error => error !== '');
@@ -44,16 +56,15 @@ export const AddActivityModal = ({ isOpen, onClose, onAdd }: AddActivityModalPro
 
     setIsLoading(true);
     try {
+      const completedAt = isNow
+        ? new Date().toISOString()
+        : new Date(`${date}T${time}`).toISOString();
+
       await onAdd({
         activityType: activityType.trim(),
         intensity,
         durationMinutes: Number(duration),
-        completedAt: new Date().toISOString(),
-      });
-
-      toast.success('Activity Logged Successfully', {
-        description: 'Your activity has been added to the tracker',
-        duration: 3000,
+        completedAt,
       });
 
       resetForm();
@@ -81,7 +92,10 @@ export const AddActivityModal = ({ isOpen, onClose, onAdd }: AddActivityModalPro
     setActivityType('');
     setIntensity('Medium');
     setDuration('');
-    setErrors({ activityType: '', duration: '', intensity: '' });
+    setIsNow(true);
+    setDate(new Date().toISOString().split('T')[0]);
+    setTime(new Date().toTimeString().slice(0, 5));
+    setErrors({ activityType: '', duration: '', intensity: '', dateTime: '' });
   };
 
   const handleClose = () => {
@@ -90,6 +104,19 @@ export const AddActivityModal = ({ isOpen, onClose, onAdd }: AddActivityModalPro
   };
 
   const intensityOptions: Array<'Low' | 'Medium' | 'High'> = ['Low', 'Medium', 'High'];
+
+  const getIntensityBgColor = (level: string) => {
+    switch (level.toLowerCase()) {
+      case 'low':
+        return 'from-emerald-500/20 to-teal-500/20';
+      case 'medium':
+        return 'from-amber-500/20 to-orange-500/20';
+      case 'high':
+        return 'from-red-500/20 to-pink-500/20';
+      default:
+        return 'from-gray-500/20 to-slate-500/20';
+    }
+  };
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm'>
@@ -137,11 +164,13 @@ export const AddActivityModal = ({ isOpen, onClose, onAdd }: AddActivityModalPro
                 onClick={() => setIntensity(level)}
                 className={`p-4 rounded-xl font-medium transition-all flex flex-col items-center gap-2 ${
                   intensity === level
-                    ? level === 'Low'
-                      ? 'bg-emerald-500 text-white shadow-lg'
-                      : level === 'Medium'
-                        ? 'bg-amber-500 text-white shadow-lg'
-                        : 'bg-red-500 text-white shadow-lg'
+                    ? `bg-linear-to-br ${getIntensityBgColor(level)} border ${
+                        level === 'Low'
+                          ? 'border-emerald-500/50'
+                          : level === 'Medium'
+                            ? 'border-amber-500/50'
+                            : 'border-red-500/50'
+                      } shadow-lg`
                     : 'bg-white/10 text-gray-400 hover:bg-white/20'
                 }`}
               >
@@ -153,7 +182,7 @@ export const AddActivityModal = ({ isOpen, onClose, onAdd }: AddActivityModalPro
           {errors.intensity && <p className='mt-2 text-sm text-red-400'>{errors.intensity}</p>}
         </div>
 
-        <div className='mb-8'>
+        <div className='mb-6'>
           <label className='block text-gray-400 text-sm font-medium mb-3 uppercase tracking-wide'>
             Duration
           </label>
@@ -173,6 +202,59 @@ export const AddActivityModal = ({ isOpen, onClose, onAdd }: AddActivityModalPro
             </span>
           </div>
           {errors.duration && <p className='mt-2 text-sm text-red-400'>{errors.duration}</p>}
+        </div>
+
+        <div className='mb-8'>
+          <div className='flex items-center gap-3 mb-4'>
+            <input
+              type='checkbox'
+              id='isNow'
+              checked={isNow}
+              onChange={e => setIsNow(e.target.checked)}
+              className='w-4 h-4 rounded cursor-pointer'
+            />
+            <label htmlFor='isNow' className='text-gray-400 text-sm font-medium cursor-pointer'>
+              Log as now
+            </label>
+          </div>
+
+          {!isNow && (
+            <div className='grid grid-cols-2 gap-4'>
+              <div>
+                <label className='block text-gray-400 text-sm font-medium mb-2 uppercase tracking-wide'>
+                  Date
+                </label>
+                <input
+                  type='date'
+                  value={date}
+                  onChange={e => {
+                    setDate(e.target.value);
+                    if (errors.dateTime) {
+                      setErrors(prev => ({ ...prev, dateTime: '' }));
+                    }
+                  }}
+                  className='w-full bg-[#322840]/60 border border-white/10 rounded-xl px-5 py-3 text-white focus:outline-none focus:border-[#d98a9d] focus:bg-[#322840]/80 transition-all'
+                />
+              </div>
+              <div>
+                <label className='block text-gray-400 text-sm font-medium mb-2 uppercase tracking-wide'>
+                  Time
+                </label>
+                <input
+                  type='time'
+                  value={time}
+                  onChange={e => {
+                    setTime(e.target.value);
+                    if (errors.dateTime) {
+                      setErrors(prev => ({ ...prev, dateTime: '' }));
+                    }
+                  }}
+                  className='w-full bg-[#322840]/60 border border-white/10 rounded-xl px-5 py-3 text-white focus:outline-none focus:border-[#d98a9d] focus:bg-[#322840]/80 transition-all'
+                />
+              </div>
+            </div>
+          )}
+          {errors.dateTime && <p className='mt-2 text-sm text-red-400'>{errors.dateTime}</p>}
         </div>
 
         <div className='flex gap-4'>

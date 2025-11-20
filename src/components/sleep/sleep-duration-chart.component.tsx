@@ -31,8 +31,6 @@ export const SleepDurationChart = () => {
     getSleepLogs();
   }, []);
 
-  console.log(sleepLogs);
-
   const chartData = useMemo(() => {
     if (!sleepLogs || sleepLogs.length === 0) {
       return [];

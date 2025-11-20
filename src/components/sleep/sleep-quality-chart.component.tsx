@@ -88,8 +88,6 @@ export const SleepQualityChart = () => {
     return result;
   }, [sleepLogs, period]);
 
-  console.log(chartData);
-
   return (
     <Card className='bg-[#1a0F16] border border-[#36282F] rounded-2xl p-8'>
       <div className='flex justify-between mb-8'>

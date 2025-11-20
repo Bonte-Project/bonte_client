@@ -105,7 +105,7 @@ export const TrainerProfileComponent = () => {
   };
 
   const formatDateDisplay = (dateString: string | undefined): string => {
-    if (!dateString) return '—';
+    if (!dateString) return '–';
 
     if (dateString.includes('T')) {
       const date = new Date(dateString);
@@ -147,7 +147,7 @@ export const TrainerProfileComponent = () => {
           onClick={() => setSelectedDate(i)}
           className={`p-2 rounded-lg cursor-pointer transition-all ${
             isSelected
-              ? 'bg-[#D98A9D] text-[#1a1a1a] font-bold'
+              ? 'bg-[#D98A9D] text-[#1e1416] font-bold'
               : 'hover:bg-[#D98A9D]/20 text-white'
           }`}
         >
@@ -232,7 +232,7 @@ export const TrainerProfileComponent = () => {
 
   if (!trainer || !user) {
     return (
-      <div className='relative min-h-screen w-full overflow-hidden bg-[#1a1a1a]'>
+      <div className='relative min-h-screen w-full overflow-hidden bg-[#1e1416]'>
         <div className='absolute inset-0 z-0'>
           <div className='absolute -top-1/4 -right-1/4 h-[150%] w-[150%] origin-bottom-left -skew-y-12 transform bg-linear-to-br from-[#E9D5FF]/5 via-[#D98A9D]/10 to-[#D98A9D]/10'></div>
         </div>
@@ -246,13 +246,13 @@ export const TrainerProfileComponent = () => {
   }
 
   return (
-    <div className='relative min-h-screen w-full overflow-hidden bg-[#1a1a1a]'>
+    <div className='relative min-h-screen w-full overflow-hidden bg-[#1e1416]'>
       <div className='absolute inset-0 z-0'>
         <div className='absolute -top-1/4 -right-1/4 h-[150%] w-[150%] origin-bottom-left -skew-y-12 transform bg-linear-to-br from-[#E9D5FF]/5 via-[#D98A9D]/10 to-[#D98A9D]/10'></div>
       </div>
 
       <main className='relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12'>
-        <div className='mb-8 rounded-2xl border border-white/10 bg-[#242424] backdrop-blur-md p-8 lg:p-10'>
+        <div className='mb-8 rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-8 shadow-2xl shadow-[#D98A9D]/5 lg:p-10'>
           <div className='flex flex-col items-center gap-6 lg:flex-row lg:justify-between lg:items-start'>
             <div className='flex flex-col items-center gap-4 lg:flex-row lg:gap-6'>
               <div className='relative'>
@@ -276,7 +276,7 @@ export const TrainerProfileComponent = () => {
             <button
               onClick={() => setShowEditModal(true)}
               disabled={isLoading}
-              className='flex items-center gap-2 rounded-lg bg-[#D98A9D] px-6 py-3 text-base font-bold text-white transition-all duration-300 hover:bg-[#c87b8f] hover:shadow-lg hover:shadow-[#D98A9D]/20 focus:outline-none focus:ring-2 focus:ring-[#D98A9D]/50 disabled:opacity-50'
+              className='flex items-center gap-2 rounded-lg bg-[#D98A9D] px-6 py-3 text-base font-bold text-white transition-all duration-300 border border-[#D98A9D]/30 hover:bg-[#c87b8f] hover:border-[#D98A9D]/50 focus:outline-none focus:ring-2 focus:ring-[#D98A9D]/50 disabled:opacity-50'
             >
               <Edit2 size={20} />
               Edit Profile
@@ -284,39 +284,39 @@ export const TrainerProfileComponent = () => {
           </div>
 
           <div className='mt-8 grid grid-cols-3 gap-4 border-t border-white/10 pt-8 sm:grid-cols-3 lg:grid-cols-6'>
-            <div className='rounded-lg bg-white/5 p-4 text-center hover:bg-white/10 transition-colors'>
+            <div className='rounded-lg bg-black/30 p-4 text-center'>
               <p className='text-xs font-medium text-gray-400 uppercase tracking-wide'>Age</p>
               <p className='mt-3 text-2xl font-black text-white'>{user.age}</p>
             </div>
-            <div className='rounded-lg bg-white/5 p-4 text-center hover:bg-white/10 transition-colors'>
+            <div className='rounded-lg bg-black/30 p-4 text-center'>
               <p className='text-xs font-medium text-gray-400 uppercase tracking-wide'>Height</p>
               <p className='mt-3 text-2xl font-black text-white'>
                 {user.height}
                 <span className='text-xs font-normal text-gray-400 block'>cm</span>
               </p>
             </div>
-            <div className='rounded-lg bg-white/5 p-4 text-center hover:bg-white/10 transition-colors'>
+            <div className='rounded-lg bg-black/30 p-4 text-center'>
               <p className='text-xs font-medium text-gray-400 uppercase tracking-wide'>Weight</p>
               <p className='mt-3 text-2xl font-black text-white'>
                 {user.weight}
                 <span className='text-xs font-normal text-gray-400 block'>kg</span>
               </p>
             </div>
-            <div className='rounded-lg bg-white/5 p-4 text-center hover:bg-white/10 transition-colors'>
+            <div className='rounded-lg bg-black/30 p-4 text-center'>
               <p className='text-xs font-medium text-gray-400 uppercase tracking-wide'>
                 Specialization
               </p>
               <p className='mt-3 text-sm font-bold text-white truncate'>
-                {trainer.specialization || '—'}
+                {trainer.specialization || '–'}
               </p>
             </div>
-            <div className='rounded-lg bg-white/5 p-4 text-center hover:bg-white/10 transition-colors'>
+            <div className='rounded-lg bg-black/30 p-4 text-center'>
               <p className='text-xs font-medium text-gray-400 uppercase tracking-wide'>Location</p>
               <p className='mt-3 text-sm font-bold text-white truncate'>
-                {trainer.location || '—'}
+                {trainer.location || '–'}
               </p>
             </div>
-            <div className='rounded-lg bg-white/5 p-4 text-center hover:bg-white/10 transition-colors'>
+            <div className='rounded-lg bg-black/30 p-4 text-center'>
               <p className='text-xs font-medium text-gray-400 uppercase tracking-wide'>Certs</p>
               <p className='mt-3 text-2xl font-black text-[#D98A9D]'>{certifications.length}</p>
             </div>
@@ -324,7 +324,7 @@ export const TrainerProfileComponent = () => {
         </div>
 
         <div className='grid gap-6 lg:grid-cols-2 mb-8'>
-          <div className='rounded-2xl border border-white/10 bg-[#242424] backdrop-blur-md p-6'>
+          <div className='rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-6'>
             <h2 className='text-xl font-bold text-white mb-6'>Schedule</h2>
 
             <div className='flex items-center justify-between mb-6'>
@@ -363,7 +363,7 @@ export const TrainerProfileComponent = () => {
             </div>
           </div>
 
-          <div className='rounded-2xl border border-white/10 bg-[#242424] backdrop-blur-md p-6'>
+          <div className='rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-6'>
             <h2 className='text-xl font-bold text-white mb-2'>
               {currentMonth.toLocaleString('default', { month: 'long' })} {selectedDate},{' '}
               {currentMonth.getFullYear()}
@@ -381,7 +381,7 @@ export const TrainerProfileComponent = () => {
           </div>
         </div>
 
-        <div className='rounded-2xl border border-white/10 bg-[#242424] backdrop-blur-md p-6 mb-8'>
+        <div className='rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-6 mb-8'>
           <div className='flex items-center justify-between mb-6'>
             <h2 className='text-xl font-bold text-white'>Certifications</h2>
             <button
@@ -396,14 +396,14 @@ export const TrainerProfileComponent = () => {
 
           <div className='space-y-3'>
             {certifications.length === 0 ? (
-              <div className='rounded-lg bg-[#1a1a1a] border border-[#3a3a3a] p-4 text-center'>
+              <div className='rounded-lg bg-black/30 border border-white/10 p-4 text-center'>
                 <p className='text-gray-400 text-sm'>No certifications yet</p>
               </div>
             ) : (
               certifications.map(cert => (
                 <div
                   key={cert.id}
-                  className='flex justify-between items-center p-4 rounded-lg bg-[#1a1a1a] border border-[#3a3a3a] group hover:border-[#D98A9D]/30 transition-colors'
+                  className='flex justify-between items-center p-4 rounded-lg bg-black/30 border border-white/10 group hover:border-[#D98A9D]/30 transition-colors'
                 >
                   <div className='flex-1'>
                     <p className='text-sm text-white font-medium'>{cert.name}</p>
@@ -443,7 +443,7 @@ export const TrainerProfileComponent = () => {
           </div>
         </div>
 
-        <div className='rounded-2xl border border-white/10 bg-[#242424] backdrop-blur-md p-6'>
+        <div className='rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-6'>
           <div className='flex items-center justify-between mb-6'>
             <h2 className='text-xl font-bold text-white'>Experience Overview</h2>
             <button
@@ -461,7 +461,7 @@ export const TrainerProfileComponent = () => {
 
           <div className='relative flex flex-col gap-6 pl-4 border-l-2 border-[#D98A9D]/30'>
             {!trainer.experience || trainer.experience.length === 0 ? (
-              <div className='rounded-lg bg-[#1a1a1a] border border-[#3a3a3a] p-4 text-center'>
+              <div className='rounded-lg bg-black/30 border border-white/10 p-4 text-center'>
                 <p className='text-gray-400 text-sm'>No experience yet</p>
               </div>
             ) : (

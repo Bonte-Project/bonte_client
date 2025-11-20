@@ -3,7 +3,7 @@ import { AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer } f
 import { format, startOfDay, subDays } from 'date-fns';
 import type { ActivityLog } from '@/types/activity.types';
 
-type TimePeriod = 'today' | '7days';
+type TimePeriod = 'today' | '7days' | '30days';
 
 interface ActivityChartProps {
   logs: ActivityLog[];
@@ -35,6 +35,9 @@ export const ActivityChart = ({ logs, isLoading = false }: ActivityChartProps) =
       case '7days':
         startDate = subDays(startOfDay(now), 6);
         break;
+      case '30days':
+        startDate = subDays(startOfDay(now), 29);
+        break;
       default:
         startDate = subDays(startOfDay(now), 6);
     }
@@ -61,7 +64,8 @@ export const ActivityChart = ({ logs, isLoading = false }: ActivityChartProps) =
 
     while (currentDate <= now) {
       const dateKey = format(currentDate, 'yyyy-MM-dd');
-      const dayLabel = format(currentDate, 'EEE');
+      const dayLabel =
+        period === '30days' ? format(currentDate, 'M/d') : format(currentDate, 'EEE');
       const data = dailyMap.get(dateKey) || { duration: 0, count: 0 };
 
       result.push({
@@ -87,18 +91,19 @@ export const ActivityChart = ({ logs, isLoading = false }: ActivityChartProps) =
 
   return (
     <div className='bg-[#1a0F16] border border-[#36282F] rounded-2xl p-8'>
-      <div className='flex justify-between items-start sm:items-center gap-4 mb-8'>
+      <div className='flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-8'>
         <div>
           <h3 className='text-xl sm:text-2xl font-bold text-white mb-2'>Weekly Activity Trends</h3>
           <span className='text-gray-400 text-sm'>
-            Activity duration over the past {period === 'today' ? 'day' : '7 days'}
+            Activity duration over the past{' '}
+            {period === 'today' ? 'day' : period === '7days' ? '7 days' : '30 days'}
           </span>
         </div>
 
-        <div className='flex gap-2'>
+        <div className='flex flex-wrap gap-2'>
           <button
             onClick={() => setPeriod('today')}
-            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all ${
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all whitespace-nowrap ${
               period === 'today'
                 ? 'bg-[#d98a9d] text-white'
                 : 'bg-white/5 text-gray-400 hover:bg-white/10'
@@ -108,13 +113,23 @@ export const ActivityChart = ({ logs, isLoading = false }: ActivityChartProps) =
           </button>
           <button
             onClick={() => setPeriod('7days')}
-            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all ${
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all whitespace-nowrap ${
               period === '7days'
                 ? 'bg-[#d98a9d] text-white'
                 : 'bg-white/5 text-gray-400 hover:bg-white/10'
             }`}
           >
-            Last 7 Days
+            7 Days
+          </button>
+          <button
+            onClick={() => setPeriod('30days')}
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all whitespace-nowrap ${
+              period === '30days'
+                ? 'bg-[#d98a9d] text-white'
+                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+            }`}
+          >
+            30 Days
           </button>
         </div>
       </div>
