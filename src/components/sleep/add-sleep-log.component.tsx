@@ -311,7 +311,7 @@ export const AddSleepLog = () => {
       <button
         onClick={handleSubmit}
         disabled={isLoading}
-        className='w-full bg-[#D98A9D] hover:bg-[#e09ab0] active:bg-[#c87a8d] text-white font-semibold py-4 rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wide'
+        className='block mx-auto w-full md:w-[50%] px-5 py-2.5 bg-primary-button text-white rounded-lg font-medium shadow-lg shadow-primary-button/20 transition-all duration-300 ease-in-out hover:bg-[#c87b8f] hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-primary-button/50 disabled:opacity-70 disabled:cursor-not-allowed'
       >
         {isLoading ? 'Saving...' : 'Save Sleep Log'}
       </button>
