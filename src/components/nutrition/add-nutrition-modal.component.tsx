@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { useNutritionLogs } from '@/store/nutrition-logs.store';
+import { useNutritionLogsStore } from '@/store/nutrition-logs.store';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
 
 interface Meal {
@@ -21,7 +21,7 @@ interface AddMealModalProps {
 }
 
 export const AddNutritionModal = ({ isOpen, onClose, onAdd }: AddMealModalProps) => {
-  const { isLoading } = useNutritionLogs();
+  const { isLoading } = useNutritionLogsStore();
   const toast = useCustomToast();
 
   const now = new Date();
@@ -152,7 +152,7 @@ export const AddNutritionModal = ({ isOpen, onClose, onAdd }: AddMealModalProps)
       resetForm();
       onClose();
     } catch (_) {
-      toast.error('Server Error', {
+      toast.error('Error Occured', {
         description: 'Failed to add meal. Please try again.',
         duration: 4000,
       });

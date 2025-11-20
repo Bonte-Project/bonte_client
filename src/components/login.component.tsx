@@ -288,7 +288,7 @@ export const LoginForm = () => {
             </div>
 
             {/* Google Sign-Up */}
-            <div className='w-full flex justify-center '>
+            <div className='w-full flex justify-center'>
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={handleGoogleError}

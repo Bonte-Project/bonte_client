@@ -17,6 +17,7 @@ export interface NutritionState {
   getNutritionLogs: () => Promise<void>;
   addNutritionLog: (meal: Omit<Meal, 'id'>) => Promise<void>;
   deleteNutritionLog: (id: string) => Promise<void>;
+  updateNutritionLog: (id: string, nutritionLog: Meal) => Promise<void>;
 }
 
 export interface NutritionLogsResponse {
@@ -25,6 +26,11 @@ export interface NutritionLogsResponse {
 }
 
 export interface CreateNutritionLogResponse {
+  message: string;
+  log: Meal;
+}
+
+export interface UpdateNutritionLogResponse {
   message: string;
   log: Meal;
 }

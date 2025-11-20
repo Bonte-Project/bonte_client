@@ -14,6 +14,7 @@ import {
   HelpCircle,
   Sparkles,
   User,
+  AlarmClock,
 } from 'lucide-react';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
 import { useAuthStore } from '@/store/auth.store';
@@ -52,6 +53,7 @@ export const Header = () => {
     { id: 'trends', label: 'Trends', icon: TrendingUp, href: '/trends' },
     { id: 'nutrition', label: 'Nutrition', icon: UtensilsCrossed, href: '/nutrition' },
     { id: 'activity', label: 'Activity', icon: Dumbbell, href: '/activity' },
+    { id: 'sleep', label: 'Sleep', icon: AlarmClock, href: '/sleep' },
   ];
 
   const trainerNavItems = [

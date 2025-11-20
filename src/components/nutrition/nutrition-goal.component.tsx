@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Settings, Loader2 } from 'lucide-react';
 import { NutritionGoalModal } from './nutrition-goal-modal.component';
-import { useNutritionGoal } from '@/store/nutrition-goal.store';
+import { useNutritionGoalStore } from '@/store/nutrition-goal.store';
 import type { NutritionData } from '@/types/nutrition.types';
 
 export const NutritionGoal = ({ data }: { data: NutritionData }) => {
   const { isLoading, error, nutritionGoal, getNutritionGoal, setNutritionGoal } =
-    useNutritionGoal();
+    useNutritionGoalStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const calorieGoal = nutritionGoal?.calories ?? null;

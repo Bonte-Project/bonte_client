@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as TrainerProfileRouteImport } from './routes/trainer-profile'
+import { Route as SleepRouteImport } from './routes/sleep'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as NutritionRouteImport } from './routes/nutrition'
@@ -28,6 +29,11 @@ const VerifyEmailRoute = VerifyEmailRouteImport.update({
 const TrainerProfileRoute = TrainerProfileRouteImport.update({
   id: '/trainer-profile',
   path: '/trainer-profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SleepRoute = SleepRouteImport.update({
+  id: '/sleep',
+  path: '/sleep',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/nutrition': typeof NutritionRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/sleep': typeof SleepRoute
   '/trainer-profile': typeof TrainerProfileRoute
   '/verify-email': typeof VerifyEmailRoute
 }
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/nutrition': typeof NutritionRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/sleep': typeof SleepRoute
   '/trainer-profile': typeof TrainerProfileRoute
   '/verify-email': typeof VerifyEmailRoute
 }
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/nutrition': typeof NutritionRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/sleep': typeof SleepRoute
   '/trainer-profile': typeof TrainerProfileRoute
   '/verify-email': typeof VerifyEmailRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/nutrition'
     | '/profile'
     | '/register'
+    | '/sleep'
     | '/trainer-profile'
     | '/verify-email'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/nutrition'
     | '/profile'
     | '/register'
+    | '/sleep'
     | '/trainer-profile'
     | '/verify-email'
   id:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/nutrition'
     | '/profile'
     | '/register'
+    | '/sleep'
     | '/trainer-profile'
     | '/verify-email'
   fileRoutesById: FileRoutesById
@@ -156,6 +168,7 @@ export interface RootRouteChildren {
   NutritionRoute: typeof NutritionRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
+  SleepRoute: typeof SleepRoute
   TrainerProfileRoute: typeof TrainerProfileRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
 }
@@ -174,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/trainer-profile'
       fullPath: '/trainer-profile'
       preLoaderRoute: typeof TrainerProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sleep': {
+      id: '/sleep'
+      path: '/sleep'
+      fullPath: '/sleep'
+      preLoaderRoute: typeof SleepRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register': {
@@ -244,6 +264,7 @@ const rootRouteChildren: RootRouteChildren = {
   NutritionRoute: NutritionRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
+  SleepRoute: SleepRoute,
   TrainerProfileRoute: TrainerProfileRoute,
   VerifyEmailRoute: VerifyEmailRoute,
 }
