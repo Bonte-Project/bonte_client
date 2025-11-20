@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useEffect, useMemo, useState } from 'react';
+import { Card } from '../ui/card';
 import {
   Select,
   SelectContent,
@@ -10,15 +10,29 @@ import {
   SelectValue,
 } from '../ui/select';
 import type { TimePeriod } from '@/types/nutrition.types';
-import { useNutritionLogsStore } from '@/store/nutrition-logs.store';
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import { useSleepLogsStore } from '@/store/sleep-logs.store';
 import { format, startOfDay, subDays } from 'date-fns';
 
-export const NutritionChart = () => {
+export const SleepQualityChart = () => {
   const [period, setPeriod] = useState<TimePeriod>('7days');
-  const { logs } = useNutritionLogsStore();
+
+  const { sleepLogs, getSleepLogs } = useSleepLogsStore();
+
+  useEffect(() => {
+    getSleepLogs();
+  }, []);
 
   const chartData = useMemo(() => {
-    if (!logs || logs.length === 0) {
+    if (!sleepLogs || sleepLogs.length === 0) {
       return [];
     }
 
@@ -39,19 +53,19 @@ export const NutritionChart = () => {
         startDate = subDays(startOfDay(now), 6);
     }
 
-    const filteredLogs = logs.filter(log => {
-      const logDate = new Date(log.eatenAt);
+    const filteredLogs = sleepLogs.filter(sleepLog => {
+      const logDate = new Date(sleepLog.startTime);
       return logDate >= startDate && logDate <= now;
     });
 
     const dailyMap = new Map<string, number>();
 
-    filteredLogs.forEach(log => {
-      const date = startOfDay(new Date(log.eatenAt));
+    filteredLogs.forEach(sleepLog => {
+      const date = startOfDay(new Date(sleepLog.startTime));
       const dateKey = format(date, 'yyyy-MM-dd');
 
       const current = dailyMap.get(dateKey) || 0;
-      dailyMap.set(dateKey, current + log.calories);
+      dailyMap.set(dateKey, current + sleepLog.quality);
     });
 
     const result = [];
@@ -64,7 +78,7 @@ export const NutritionChart = () => {
 
       result.push({
         day: dayLabel,
-        calories: dailyMap.get(dateKey) || 0,
+        quality: dailyMap.get(dateKey) || 0,
       });
 
       currentDate = new Date(currentDate);
@@ -72,20 +86,14 @@ export const NutritionChart = () => {
     }
 
     return result;
-  }, [logs, period]);
+  }, [sleepLogs, period]);
+
+  console.log(chartData);
 
   return (
-    <div className='bg-[#1a0F16] border border-[#36282F] rounded-2xl p-8'>
+    <Card className='bg-[#1a0F16] border border-[#36282F] rounded-2xl p-8'>
       <div className='flex justify-between mb-8'>
-        <div>
-          <h3 className='text-2xl font-bold text-white mb-3'>Daily Trends</h3>
-          <div className='mb-2'>
-            <span className='text-gray-400 text-md'>
-              Calorie intake over the past{' '}
-              {period === 'today' ? 'today' : period === '7days' ? '7' : '30'} days
-            </span>
-          </div>
-        </div>
+        <h2 className='text-xl sm:text-2xl font-bold text-white mb-8'>Sleep Quality Over Time</h2>
 
         <Select value={period} onValueChange={value => setPeriod(value as TimePeriod)}>
           <SelectTrigger className='w-[180px] bg-white/5 border-white/10 text-white hover:bg-white/10 focus:ring-2 focus:ring-primary-button/50'>
@@ -120,31 +128,32 @@ export const NutritionChart = () => {
       <ResponsiveContainer width='100%' height={300}>
         <AreaChart data={chartData}>
           <defs>
-            <linearGradient id='colorCalories' x1='0' y1='0' x2='0' y2='1'>
+            <linearGradient id='colorQuality' x1='0' y1='0' x2='0' y2='1'>
               <stop offset='5%' stopColor='#ff1493' stopOpacity={0.8} />
               <stop offset='95%' stopColor='#ff1493' stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray='3 3' stroke='#444' vertical={false} />
           <XAxis dataKey='day' stroke='#888' />
+          <YAxis dataKey='quality' stroke='#888' />
           <Tooltip
             contentStyle={{
               backgroundColor: '#1a0F16',
               border: '1px solid #36282F',
               color: 'white',
             }}
-            formatter={(value: number) => `${value} kcal`}
+            formatter={(value: number) => `${value}`}
           />
           <Area
             type='monotone'
-            dataKey='calories'
+            dataKey='quality'
             stroke='#ff1493'
             strokeWidth={3}
             fillOpacity={1}
-            fill='url(#colorCalories)'
+            fill='url(#colorQuality)'
           />
         </AreaChart>
       </ResponsiveContainer>
-    </div>
+    </Card>
   );
 };

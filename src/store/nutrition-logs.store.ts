@@ -4,10 +4,11 @@ import type {
   Meal,
   NutritionLogsResponse,
   NutritionState,
+  UpdateNutritionLogResponse,
 } from '@/types/nutrition.types';
 import { create } from 'zustand';
 
-export const useNutritionLogs = create<NutritionState>((set, get) => ({
+export const useNutritionLogsStore = create<NutritionState>((set, get) => ({
   isLoading: false,
   error: null,
   logs: [],
@@ -78,6 +79,30 @@ export const useNutritionLogs = create<NutritionState>((set, get) => ({
       set({ logs: get().logs.filter(log => log.id !== id) });
     } catch (error) {
       const message = error instanceof ApiError ? error.message : 'Failed to delete nutrition log';
+      set({ isLoading: false, error: message });
+      throw error;
+    }
+  },
+
+  updateNutritionLog: async (id: string, nutritionLog: Meal) => {
+    set({ isLoading: true, error: null });
+    try {
+      const token = localStorage.getItem('token');
+      const response = await apiRequest<UpdateNutritionLogResponse>(`/nutrition-logs/${id}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(nutritionLog),
+      });
+
+      set({
+        logs: get().logs.map(log => (log.id === id ? response.log : log)),
+        isLoading: false,
+      });
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : 'Failed to update nutrition log';
       set({ isLoading: false, error: message });
       throw error;
     }

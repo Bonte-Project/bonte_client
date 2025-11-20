@@ -1,11 +1,5 @@
-import { ActivityLog } from '@/components/activity-log.component';
-
 const ActivityPage = () => {
-  return (
-    <div className='p-2'>
-      <ActivityLog />;
-    </div>
-  );
+  return <div className='p-2'>Activity</div>;
 };
 
 export default ActivityPage;

@@ -1,13 +1,13 @@
 import { Card } from '@/components/ui/card';
 import { NutritionGoal } from './nutrition-goal.component';
 import { NutritionLogs } from './nutrition-logs.component';
-import { useNutritionLogs } from '@/store/nutrition-logs.store';
+import { useNutritionLogsStore } from '@/store/nutrition-logs.store';
 import type { NutritionData } from '@/types/nutrition.types';
 import { endOfDay, isWithinInterval, startOfDay } from 'date-fns';
 import { NutritionChart } from './nutrition-chart.component';
 
 export const NutritionSummary = () => {
-  const { logs } = useNutritionLogs();
+  const { logs } = useNutritionLogsStore();
 
   const now = new Date();
   const todayStart = startOfDay(now);

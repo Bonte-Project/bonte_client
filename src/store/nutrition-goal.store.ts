@@ -6,7 +6,7 @@ import type {
 } from '@/types/nutrition.types';
 import { create } from 'zustand';
 
-export const useNutritionGoal = create<NutritionGoalState>(set => ({
+export const useNutritionGoalStore = create<NutritionGoalState>(set => ({
   isLoading: false,
   error: null,
   nutritionGoal: null,
