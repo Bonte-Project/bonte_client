@@ -268,7 +268,7 @@ export const AddNutritionModal = ({ isOpen, onClose, onAdd }: AddMealModalProps)
               }}
               className={`w-full bg-[#322840]/60 border ${
                 errors.eatenAtDate ? 'border-red-500/50' : 'border-white/10'
-              } rounded-xl px-5 py-3 text-lg text-white focus:outline-none focus:border-[#ff1493] focus:bg-[#322840]/80 transition-all [color-scheme:dark]`}
+              } rounded-xl px-5 py-3 text-lg text-white focus:outline-none focus:border-[#ff1493] focus:bg-[#322840]/80 transition-all scheme-dark`}
             />
             {errors.eatenAtDate && (
               <p className='mt-2 text-sm text-red-400'>{errors.eatenAtDate}</p>
@@ -289,7 +289,7 @@ export const AddNutritionModal = ({ isOpen, onClose, onAdd }: AddMealModalProps)
               }}
               className={`w-full bg-[#322840]/60 border ${
                 errors.eatenAtTime ? 'border-red-500/50' : 'border-white/10'
-              } rounded-xl px-5 py-3 text-lg text-white focus:outline-none focus:border-[#ff1493] focus:bg-[#322840]/80 transition-all [color-scheme:dark]`}
+              } rounded-xl px-5 py-3 text-lg text-white focus:outline-none focus:border-[#ff1493] focus:bg-[#322840]/80 transition-all scheme-dark`}
             />
             {errors.eatenAtTime && (
               <p className='mt-2 text-sm text-red-400'>{errors.eatenAtTime}</p>

@@ -1,9 +1,9 @@
-import { ActivityLog } from '@/components/activity-log.component';
+import { ActivityTrackerSummary } from '@/components/activity/activity-summary.component';
 
 const ActivityPage = () => {
   return (
     <div className='p-2'>
-      <ActivityLog />;
+      <ActivityTrackerSummary />;
     </div>
   );
 };

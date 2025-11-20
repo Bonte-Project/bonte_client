@@ -127,7 +127,7 @@ export const NutritionGoal = ({ data }: { data: NutritionData }) => {
               stroke='#3d2a4d'
               strokeWidth='12'
               fill='none'
-              className='sm:stroke-[14] lg:stroke-[16]'
+              className='sm:stroke-14 lg:stroke-16'
             />
             <circle
               cx='50%'
@@ -139,7 +139,7 @@ export const NutritionGoal = ({ data }: { data: NutritionData }) => {
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
               strokeLinecap='round'
-              className='sm:stroke-[14] lg:stroke-[16]'
+              className='sm:stroke-14 lg:stroke-16'
             />
             <defs>
               <linearGradient id='gradient' x1='0%' y1='0%' x2='100%' y2='0%'>

@@ -135,7 +135,7 @@ export const NutritionLogs = () => {
             {todaysLogs.map(meal => (
               <div
                 key={meal.id}
-                className={`bg-gradient-to-br ${getMealColor(meal.mealType)} border rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 group`}
+                className={`bg-linear-to-br ${getMealColor(meal.mealType)} border rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 group`}
               >
                 <div className='flex items-start justify-between mb-4'>
                   <div className='flex items-center gap-3'>
