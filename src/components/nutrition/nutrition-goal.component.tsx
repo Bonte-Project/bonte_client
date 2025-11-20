@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Settings, Loader2 } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { NutritionGoalModal } from './nutrition-goal-modal.component';
 import { useNutritionGoalStore } from '@/store/nutrition-goal.store';
 import type { NutritionData } from '@/types/nutrition.types';
@@ -60,7 +60,9 @@ export const NutritionGoal = ({ data }: { data: NutritionData }) => {
         </div>
         <div className='flex items-center justify-center py-16 sm:py-24'>
           <div className='flex flex-col items-center gap-4'>
-            <Loader2 className='w-12 h-12 sm:w-16 sm:h-16 text-purple-400 animate-spin' />
+            <div className='flex justify-center items-center py-4'>
+              <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#ff1493]'></div>
+            </div>
             <p className='text-gray-400 text-sm sm:text-base'>Loading nutrition data...</p>
           </div>
         </div>

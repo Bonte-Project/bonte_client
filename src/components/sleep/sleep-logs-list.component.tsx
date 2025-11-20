@@ -538,7 +538,7 @@ export const SleepLogsList = () => {
                             </AlertDialogCancel>
                             <AlertDialogAction
                               onClick={handleUpdateSubmit}
-                              className='bg-[#D98A9D] hover:bg-[#e09ab0] text-white border-0'
+                              className='px-5 py-2.5 bg-primary-button text-white rounded-lg font-medium shadow-lg shadow-primary-button/20 transition-all duration-300 ease-in-out hover:bg-[#c87b8f] hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-primary-button/50 disabled:opacity-70 disabled:cursor-not-allowed'
                             >
                               Save Changes
                             </AlertDialogAction>

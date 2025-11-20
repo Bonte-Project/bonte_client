@@ -129,8 +129,8 @@ export const SleepQualityChart = () => {
         <AreaChart data={chartData}>
           <defs>
             <linearGradient id='colorQuality' x1='0' y1='0' x2='0' y2='1'>
-              <stop offset='5%' stopColor='#ff1493' stopOpacity={0.8} />
-              <stop offset='95%' stopColor='#ff1493' stopOpacity={0} />
+              <stop offset='5%' stopColor='#d98a9d' stopOpacity={0.8} />
+              <stop offset='95%' stopColor='#d98a9d' stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray='3 3' stroke='#444' vertical={false} />
@@ -147,7 +147,7 @@ export const SleepQualityChart = () => {
           <Area
             type='monotone'
             dataKey='quality'
-            stroke='#ff1493'
+            stroke='#d98a9d'
             strokeWidth={3}
             fillOpacity={1}
             fill='url(#colorQuality)'
