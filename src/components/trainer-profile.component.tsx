@@ -213,7 +213,13 @@ export const TrainerProfileComponent = () => {
   };
 
   const handleDeleteExperience = async (expId: string) => {
-    await deleteExperience(expId);
+    const wasDeleted = await deleteExperience(expId);
+
+    if (wasDeleted) {
+      success('Experience Deleted', {
+        description: 'Experience item has been removed',
+      });
+    }
   };
 
   const handleEditExperience = (expId: string) => {

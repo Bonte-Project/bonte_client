@@ -96,19 +96,19 @@ export const NutritionChart = () => {
               <SelectLabel className='text-gray-400'>Time Period</SelectLabel>
               <SelectItem
                 value='today'
-                className='text-white hover:bg-white/10 focus:bg-white/10 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer'
+                className='text-white hover:bg-white/10 focus:bg-white/10 data-highlighted:bg-white/10 data-highlighted:text-white cursor-pointer'
               >
                 Today
               </SelectItem>
               <SelectItem
                 value='7days'
-                className='text-white hover:bg-white/10 focus:bg-white/10 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer'
+                className='text-white hover:bg-white/10 focus:bg-white/10 data-highlighted:bg-white/10 data-highlighted:text-white cursor-pointer'
               >
                 Last 7 Days
               </SelectItem>
               <SelectItem
                 value='30days'
-                className='text-white hover:bg-white/10 focus:bg-white/10 data-[highlighted]:bg-white/10 data-[highlighted]:text-white cursor-pointer'
+                className='text-white hover:bg-white/10 focus:bg-white/10 data-highlighted:bg-white/10 data-highlighted:text-white cursor-pointer'
               >
                 Last 30 Days
               </SelectItem>

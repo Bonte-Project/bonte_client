@@ -262,6 +262,9 @@ export class FormValidator {
    * Requirements:
    * - Required
    * - Valid date format (YYYY-MM)
+   * - Year must be within realistic range (1900–current year)
+   * - Month must be 01–12
+   * - Cannot be in the far future (optional)
    */
   static validateStartDate(startDate: string): string | undefined {
     if (!startDate) {
@@ -272,27 +275,64 @@ export class FormValidator {
       return 'Invalid date format';
     }
 
+    const [yearStr, monthStr] = startDate.split('-');
+    const year = Number(yearStr);
+    const month = Number(monthStr);
+
+    const currentYear = new Date().getFullYear();
+
+    if (year < 1900 || year > currentYear) {
+      return `Year must be between 1900 and ${currentYear}`;
+    }
+
+    if (month < 1 || month > 12) {
+      return 'Month must be between 01 and 12';
+    }
+
     return undefined;
   }
-
   /**
    * Validate end date
    * Requirements:
    * - Required
    * - Valid date format (YYYY-MM) or "Present"
    * - Cannot be before start date
+   * - Year must be realistic
    */
   static validateEndDate(endDate: string, startDate: string): string | undefined {
     if (!endDate) {
       return 'End date is required';
     }
 
-    if (endDate !== 'Present' && !/^\d{4}-\d{2}$/.test(endDate)) {
+    if (endDate === 'Present') {
+      return undefined;
+    }
+
+    if (!/^\d{4}-\d{2}$/.test(endDate)) {
       return 'Invalid date format';
     }
 
-    if (endDate !== 'Present' && startDate && endDate < startDate) {
-      return 'End date cannot be before start date';
+    const [yearStr, monthStr] = endDate.split('-');
+    const year = Number(yearStr);
+    const month = Number(monthStr);
+
+    const currentYear = new Date().getFullYear();
+
+    if (year < 1900 || year > currentYear + 1) {
+      return `Year must be between 1900 and ${currentYear + 1}`;
+    }
+
+    if (month < 1 || month > 12) {
+      return 'Month must be between 01 and 12';
+    }
+
+    if (startDate) {
+      const start = new Date(startDate + '-01');
+      const end = new Date(endDate + '-01');
+
+      if (end < start) {
+        return 'End date cannot be before start date';
+      }
     }
 
     return undefined;
@@ -349,6 +389,73 @@ export class FormValidator {
 
     if (weight < 20 || weight > 500) {
       return 'Weight must be between 20 and 500 kg';
+    }
+
+    return undefined;
+  }
+
+  // Добавить в класс FormValidator эти методы:
+
+  /**
+   * Validate activity type
+   * Requirements:
+   * - Required
+   * - At least 2 characters
+   * - Maximum 100 characters
+   */
+  static validateActivityType(activityType: string): string | undefined {
+    const trimmed = activityType.trim();
+
+    if (!trimmed) {
+      return 'Activity type is required';
+    }
+
+    if (trimmed.length < 2) {
+      return 'Activity type must be at least 2 characters';
+    }
+
+    if (trimmed.length > 100) {
+      return 'Activity type cannot exceed 100 characters';
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Validate activity duration
+   * Requirements:
+   * - Required
+   * - Greater than 0
+   * - Maximum 600 minutes (10 hours)
+   */
+  static validateActivityDuration(duration: string): string | undefined {
+    const durationNum = Number(duration);
+
+    if (!duration || durationNum <= 0) {
+      return 'Duration must be greater than 0';
+    }
+
+    if (durationNum > 600) {
+      return 'Duration cannot exceed 600 minutes';
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Validate activity intensity
+   * Requirements:
+   * - Must be one of: Low, Medium, High
+   */
+  static validateActivityIntensity(intensity: string): string | undefined {
+    const validIntensities = ['Low', 'Medium', 'High'];
+
+    if (!intensity) {
+      return 'Intensity is required';
+    }
+
+    if (!validIntensities.includes(intensity)) {
+      return 'Intensity must be Low, Medium, or High';
     }
 
     return undefined;
