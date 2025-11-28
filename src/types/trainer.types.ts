@@ -71,3 +71,8 @@ export interface ExperienceResponse {
 export interface DeleteExperienceResponse {
   message: string;
 }
+
+export interface GetAllTrainersResponse {
+  message: string;
+  trainers: Trainer[];
+}

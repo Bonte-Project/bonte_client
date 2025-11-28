@@ -12,6 +12,7 @@ import type {
   DeleteExperienceResponse,
   Trainer,
   Experience,
+  GetAllTrainersResponse,
 } from '@/types/trainer.types';
 
 interface TrainerState {
@@ -27,6 +28,7 @@ interface TrainerState {
   addExperience: (data: CreateExperienceRequest) => Promise<boolean>;
   updateExperience: (experienceId: string, data: UpdateExperienceRequest) => Promise<boolean>;
   deleteExperience: (experienceId: string) => Promise<boolean>;
+  getAllTrainers: () => Promise<Trainer[] | null>;
   clearError: () => void;
 }
 
@@ -251,6 +253,22 @@ export const useTrainerStore = create<TrainerState>((set, get) => ({
       const message = error instanceof ApiError ? error.message : 'Failed to delete experience';
       set({ isLoading: false, error: message });
       return false;
+    }
+  },
+
+  getAllTrainers: async () => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const response = await apiRequest<GetAllTrainersResponse>('/trainers');
+
+      set({ isLoading: false });
+      return response.trainers;
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : 'Failed to fetch trainers';
+
+      set({ isLoading: false, error: message });
+      return null;
     }
   },
 

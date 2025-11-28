@@ -1,14 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Edit2, Trash2, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
 import { useTrainerStore } from '@/store/trainer.store';
-import { useAuthStore } from '@/store/auth.store';
-import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
-import {
-  EditTrainerModal,
-  AddCertificationModal,
-  ExperienceModal,
-} from './trainer-modals.component';
-import type { CreateExperienceRequest, UpdateExperienceRequest } from '@/types/trainer.types';
+import { useUserStore } from '@/store/user.store';
 
 interface Certification {
   id: string;
@@ -16,33 +10,45 @@ interface Certification {
   url: string;
 }
 
-export const TrainerProfileComponent = () => {
+interface PublicTrainerProfileComponentProps {
+  id: string;
+}
+
+export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileComponentProps) => {
+  const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date().getDate());
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showCertModal, setShowCertModal] = useState(false);
-  const [showExperienceModal, setShowExperienceModal] = useState(false);
-  const [editingExperienceId, setEditingExperienceId] = useState<string | null>(null);
   const [certifications, setCertifications] = useState<Certification[]>([]);
-  const [editingCertId, setEditingCertId] = useState<string | null>(null);
-  const [editingExperienceData, setEditingExperienceData] = useState<
-    UpdateExperienceRequest | undefined
-  >();
-  const {
-    trainer,
-    isLoading,
-    addExperience,
-    updateExperience,
-    deleteExperience,
-    getMyTrainer,
-    updateTrainer,
-  } = useTrainerStore();
-  const { user } = useAuthStore();
-  const { success, error: toastError } = useCustomToast();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+
+  const { trainer, getTrainerById } = useTrainerStore();
+  const { user, getUserById } = useUserStore();
 
   useEffect(() => {
-    void getMyTrainer();
-  }, [getMyTrainer]);
+    const loadData = async () => {
+      setIsLoadingData(true);
+      try {
+        const loadedTrainer = await getTrainerById(id);
+        if (!loadedTrainer) {
+          setError('Trainer not found');
+          setIsLoadingData(false);
+          return;
+        }
+
+        const loadedUser = await getUserById(loadedTrainer.userId);
+        if (!loadedUser) {
+          setError('User-trainer not found');
+        }
+      } catch {
+        setError('Failed to load trainer profile');
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    void loadData();
+  }, [id, getTrainerById, getUserById]);
 
   useEffect(() => {
     if (trainer?.certification && trainer.certification.trim()) {
@@ -59,43 +65,6 @@ export const TrainerProfileComponent = () => {
     }
   }, [trainer?.certification]);
 
-  useEffect(() => {
-    if (editingExperienceId && trainer?.experience && trainer.experience.length > 0) {
-      const exp = trainer.experience.find(e => e.id === editingExperienceId);
-
-      if (exp) {
-        console.log('Found experience:', exp);
-
-        const startDate = exp.startDate?.includes('T')
-          ? exp.startDate.substring(0, 7)
-          : exp.startDate || '';
-
-        const endDate = exp.endDate?.includes('T')
-          ? exp.endDate.substring(0, 7)
-          : exp.endDate || '';
-
-        setEditingExperienceData({
-          title: exp.title || '',
-          description: exp.description || '',
-          startDate: startDate,
-          endDate: endDate,
-        });
-
-        console.log('Set data:', {
-          title: exp.title,
-          description: exp.description,
-          startDate,
-          endDate,
-        });
-      } else {
-        console.log('Experience not found');
-        setEditingExperienceData(undefined);
-      }
-    } else {
-      setEditingExperienceData(undefined);
-    }
-  }, [editingExperienceId, trainer?.experience]);
-
   const getDaysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   };
@@ -105,7 +74,7 @@ export const TrainerProfileComponent = () => {
   };
 
   const formatDateDisplay = (dateString: string | undefined): string => {
-    if (!dateString) return '–';
+    if (!dateString) return '—';
 
     if (dateString.includes('T')) {
       const date = new Date(dateString);
@@ -168,69 +137,7 @@ export const TrainerProfileComponent = () => {
     );
   };
 
-  const handleEditProfile = () => {
-    setShowEditModal(false);
-  };
-
-  const handleAddCertification = () => {
-    setShowCertModal(false);
-  };
-
-  const handleDeleteCertification = async (certId: string) => {
-    try {
-      const updatedCerts = certifications.filter(c => c.id !== certId);
-      setCertifications(updatedCerts);
-
-      const ifSuccess = await updateTrainer({
-        certification: JSON.stringify(updatedCerts),
-      });
-
-      if (ifSuccess) {
-        success('Certification Deleted', {
-          description: 'Your certification has been deleted',
-        });
-      }
-    } catch (error) {
-      console.error('Error deleting certification:', error);
-      const restoredCerts = certifications.concat(certifications.find(c => c.id === certId) || []);
-      setCertifications(restoredCerts);
-      toastError('Error', {
-        description: 'Failed to delete certification',
-      });
-    }
-  };
-
-  const handleAddExperience = async (experience: CreateExperienceRequest) => {
-    await addExperience(experience);
-    setShowExperienceModal(false);
-  };
-
-  const handleUpdateExperience = async (experience: UpdateExperienceRequest) => {
-    if (!editingExperienceId) return;
-    await updateExperience(editingExperienceId, experience);
-    setShowExperienceModal(false);
-    setEditingExperienceId(null);
-  };
-
-  const handleDeleteExperience = async (expId: string) => {
-    const wasDeleted = await deleteExperience(expId);
-
-    if (wasDeleted) {
-      success('Experience Deleted', {
-        description: 'Experience item has been removed',
-      });
-    }
-  };
-
-  const handleEditExperience = (expId: string) => {
-    const exp = trainer?.experience?.find(e => e.id === expId);
-    if (exp) {
-      setEditingExperienceId(expId);
-      setShowExperienceModal(true);
-    }
-  };
-
-  if (!trainer || !user) {
+  if (isLoadingData) {
     return (
       <div className='relative min-h-screen w-full overflow-hidden bg-[#1e1416]'>
         <div className='absolute inset-0 z-0'>
@@ -245,6 +152,28 @@ export const TrainerProfileComponent = () => {
     );
   }
 
+  if (error || !trainer) {
+    return (
+      <div className='relative min-h-screen w-full overflow-hidden bg-[#1e1416]'>
+        <div className='absolute inset-0 z-0'>
+          <div className='absolute -top-1/4 -right-1/4 h-[150%] w-[150%] origin-bottom-left -skew-y-12 transform bg-linear-to-br from-[#E9D5FF]/5 via-[#D98A9D]/10 to-[#D98A9D]/10'></div>
+        </div>
+        <main className='relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12'>
+          <button
+            onClick={() => navigate({ to: '/' })}
+            className='flex items-center gap-2 text-[#D98A9D] hover:text-[#c87b8f] transition-colors mb-8'
+          >
+            <ArrowLeft size={20} />
+            Go Back
+          </button>
+          <div className='text-center'>
+            <p className='text-red-400 text-lg font-semibold'>{error || 'Trainer not found'}</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className='relative min-h-screen w-full overflow-hidden bg-[#1e1416]'>
       <div className='absolute inset-0 z-0'>
@@ -252,6 +181,14 @@ export const TrainerProfileComponent = () => {
       </div>
 
       <main className='relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12'>
+        <button
+          onClick={() => navigate({ to: '/' })}
+          className='flex items-center gap-2 text-[#D98A9D] hover:text-[#c87b8f] transition-colors mb-8'
+        >
+          <ArrowLeft size={20} />
+          Go Back
+        </button>
+
         <div className='mb-8 rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-8 shadow-2xl shadow-[#D98A9D]/5 lg:p-10'>
           <div className='flex flex-col items-center gap-6 lg:flex-row lg:justify-between lg:items-start'>
             <div className='flex flex-col items-center gap-4 lg:flex-row lg:gap-6'>
@@ -259,13 +196,13 @@ export const TrainerProfileComponent = () => {
                 <img
                   alt='Trainer Avatar'
                   className='h-24 w-24 rounded-full border-4 border-[#D98A9D]/30 object-cover shadow-lg'
-                  src={user.avatarUrl || 'https://via.placeholder.com/96'}
+                  src={user?.avatarUrl || 'https://via.placeholder.com/96'}
                 />
               </div>
               <div className='text-center lg:text-left'>
                 <div className='flex flex-col lg:flex-row lg:items-center lg:gap-4'>
                   <h1 className='text-3xl font-black leading-tight tracking-tight text-white'>
-                    {user.fullName}
+                    {user?.fullName}
                   </h1>
                   {/* Activity Status Badge */}
                   <div
@@ -289,33 +226,24 @@ export const TrainerProfileComponent = () => {
                 )}
               </div>
             </div>
-
-            <button
-              onClick={() => setShowEditModal(true)}
-              disabled={isLoading}
-              className='flex items-center gap-2 rounded-lg bg-[#D98A9D] px-6 py-3 text-base font-bold text-white transition-all duration-300 border border-[#D98A9D]/30 hover:bg-[#c87b8f] hover:border-[#D98A9D]/50 focus:outline-none focus:ring-2 focus:ring-[#D98A9D]/50 disabled:opacity-50'
-            >
-              <Edit2 size={20} />
-              Edit Profile
-            </button>
           </div>
 
           <div className='mt-8 grid grid-cols-3 gap-4 border-t border-white/10 pt-8 sm:grid-cols-3 lg:grid-cols-6'>
             <div className='rounded-lg bg-black/30 p-4 text-center'>
               <p className='text-xs font-medium text-gray-400 uppercase tracking-wide'>Age</p>
-              <p className='mt-3 text-2xl font-black text-white'>{user.age}</p>
+              <p className='mt-3 text-2xl font-black text-white'>{user?.age}</p>
             </div>
             <div className='rounded-lg bg-black/30 p-4 text-center'>
               <p className='text-xs font-medium text-gray-400 uppercase tracking-wide'>Height</p>
               <p className='mt-3 text-2xl font-black text-white'>
-                {user.height}
+                {user?.height}
                 <span className='text-xs font-normal text-gray-400 block'>cm</span>
               </p>
             </div>
             <div className='rounded-lg bg-black/30 p-4 text-center'>
               <p className='text-xs font-medium text-gray-400 uppercase tracking-wide'>Weight</p>
               <p className='mt-3 text-2xl font-black text-white'>
-                {user.weight}
+                {user?.weight}
                 <span className='text-xs font-normal text-gray-400 block'>kg</span>
               </p>
             </div>
@@ -324,13 +252,13 @@ export const TrainerProfileComponent = () => {
                 Specialization
               </p>
               <p className='mt-3 text-sm font-bold text-white truncate'>
-                {trainer.specialization || '–'}
+                {trainer.specialization || '—'}
               </p>
             </div>
             <div className='rounded-lg bg-black/30 p-4 text-center'>
               <p className='text-xs font-medium text-gray-400 uppercase tracking-wide'>Location</p>
               <p className='mt-3 text-sm font-bold text-white truncate'>
-                {trainer.location || '–'}
+                {trainer.location || '—'}
               </p>
             </div>
             <div className='rounded-lg bg-black/30 p-4 text-center'>
@@ -372,12 +300,6 @@ export const TrainerProfileComponent = () => {
             </div>
 
             {renderCalendar()}
-
-            <div className='mt-6 text-center'>
-              <a href='#' className='text-[#D98A9D] text-sm font-semibold hover:underline'>
-                Add Availability
-              </a>
-            </div>
           </div>
 
           <div className='rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-6'>
@@ -399,28 +321,18 @@ export const TrainerProfileComponent = () => {
         </div>
 
         <div className='rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-6 mb-8'>
-          <div className='flex items-center justify-between mb-6'>
-            <h2 className='text-xl font-bold text-white'>Certifications</h2>
-            <button
-              onClick={() => setShowCertModal(true)}
-              disabled={isLoading}
-              className='flex items-center gap-2 rounded-lg bg-[#D98A9D]/20 px-3 py-2 text-[#D98A9D] text-sm font-bold hover:bg-[#D98A9D]/30 transition-colors disabled:opacity-50'
-            >
-              <Plus size={16} />
-              Add
-            </button>
-          </div>
+          <h2 className='text-xl font-bold text-white mb-6'>Certifications</h2>
 
           <div className='space-y-3'>
             {certifications.length === 0 ? (
               <div className='rounded-lg bg-black/30 border border-white/10 p-4 text-center'>
-                <p className='text-gray-400 text-sm'>No certifications yet</p>
+                <p className='text-gray-400 text-sm'>No certifications</p>
               </div>
             ) : (
               certifications.map(cert => (
                 <div
                   key={cert.id}
-                  className='flex justify-between items-center p-4 rounded-lg bg-black/30 border border-white/10 group hover:border-[#D98A9D]/30 transition-colors'
+                  className='flex justify-between items-start p-4 rounded-lg bg-black/30 border border-white/10 hover:border-[#D98A9D]/30 transition-colors'
                 >
                   <div className='flex-1'>
                     <p className='text-sm text-white font-medium'>{cert.name}</p>
@@ -435,25 +347,6 @@ export const TrainerProfileComponent = () => {
                       </a>
                     )}
                   </div>
-                  <div className='flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity'>
-                    <button
-                      onClick={() => {
-                        setEditingCertId(cert.id);
-                        setShowCertModal(true);
-                      }}
-                      disabled={isLoading}
-                      className='p-2 hover:bg-white/10 rounded transition-colors disabled:opacity-50'
-                    >
-                      <Edit2 size={16} className='text-gray-400' />
-                    </button>
-                    <button
-                      onClick={() => void handleDeleteCertification(cert.id)}
-                      disabled={isLoading}
-                      className='p-2 hover:bg-red-500/10 rounded transition-colors disabled:opacity-50'
-                    >
-                      <Trash2 size={16} className='text-red-400' />
-                    </button>
-                  </div>
                 </div>
               ))
             )}
@@ -461,31 +354,18 @@ export const TrainerProfileComponent = () => {
         </div>
 
         <div className='rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-6'>
-          <div className='flex items-center justify-between mb-6'>
-            <h2 className='text-xl font-bold text-white'>Experience Overview</h2>
-            <button
-              onClick={() => {
-                setEditingExperienceId(null);
-                setShowExperienceModal(true);
-              }}
-              disabled={isLoading}
-              className='flex items-center gap-2 rounded-lg bg-[#D98A9D]/20 px-3 py-2 text-[#D98A9D] text-sm font-bold hover:bg-[#D98A9D]/30 transition-colors disabled:opacity-50'
-            >
-              <Plus size={16} />
-              Add
-            </button>
-          </div>
+          <h2 className='text-xl font-bold text-white mb-6'>Experience Overview</h2>
 
           <div className='relative flex flex-col gap-6 pl-4 border-l-2 border-[#D98A9D]/30'>
             {!trainer.experience || trainer.experience.length === 0 ? (
               <div className='rounded-lg bg-black/30 border border-white/10 p-4 text-center'>
-                <p className='text-gray-400 text-sm'>No experience yet</p>
+                <p className='text-gray-400 text-sm'>No experience</p>
               </div>
             ) : (
               trainer.experience.map(exp => (
                 <div key={exp.id}>
                   <div className='absolute -left-[6.5px] top-1 h-3 w-3 rounded-full bg-[#D98A9D]'></div>
-                  <div className='flex justify-between items-start group'>
+                  <div className='flex justify-between items-start'>
                     <div className='flex-1'>
                       <h3 className='text-white font-semibold'>{exp.title}</h3>
                       {exp.description && (
@@ -495,22 +375,6 @@ export const TrainerProfileComponent = () => {
                         {formatDateDisplay(exp.startDate)} - {formatDateDisplay(exp.endDate)}
                       </p>
                     </div>
-                    <div className='flex gap-2 ml-4 opacity-0 group-hover:opacity-100 transition-opacity'>
-                      <button
-                        onClick={() => handleEditExperience(exp.id)}
-                        disabled={isLoading}
-                        className='p-2 hover:bg-white/10 rounded transition-colors disabled:opacity-50'
-                      >
-                        <Edit2 size={16} className='text-gray-400' />
-                      </button>
-                      <button
-                        onClick={() => void handleDeleteExperience(exp.id)}
-                        disabled={isLoading}
-                        className='p-2 hover:bg-red-500/10 rounded transition-colors disabled:opacity-50'
-                      >
-                        <Trash2 size={16} className='text-red-400' />
-                      </button>
-                    </div>
                   </div>
                 </div>
               ))
@@ -518,57 +382,6 @@ export const TrainerProfileComponent = () => {
           </div>
         </div>
       </main>
-
-      <EditTrainerModal
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        onSave={handleEditProfile}
-        initialData={
-          trainer && user
-            ? {
-                fullName: user.fullName,
-                avatarUrl: user.avatarUrl || '',
-                age: user.age,
-                height: user.height,
-                weight: user.weight,
-                bio: trainer.bio,
-                specialization: trainer.specialization,
-                location: trainer.location,
-                isActive: trainer.isActive,
-              }
-            : undefined
-        }
-        isLoading={isLoading}
-      />
-
-      <AddCertificationModal
-        isOpen={showCertModal}
-        onClose={() => {
-          setShowCertModal(false);
-          setEditingCertId(null);
-        }}
-        onSave={handleAddCertification}
-        initialData={editingCertId ? certifications.find(c => c.id === editingCertId) : undefined}
-        isEditing={!!editingCertId}
-        isLoading={isLoading}
-      />
-
-      <ExperienceModal
-        isOpen={showExperienceModal}
-        onClose={() => {
-          setShowExperienceModal(false);
-          setEditingExperienceId(null);
-          setEditingExperienceData(undefined);
-        }}
-        onSave={
-          editingExperienceId
-            ? exp => void handleUpdateExperience(exp)
-            : exp => void handleAddExperience(exp)
-        }
-        initialData={editingExperienceData}
-        isLoading={isLoading}
-        isEditing={!!editingExperienceId}
-      />
     </div>
   );
 };

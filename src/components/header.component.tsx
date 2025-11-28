@@ -18,10 +18,12 @@ import {
 } from 'lucide-react';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
 import { useAuthStore } from '@/store/auth.store';
+import { useTrainerStore } from '@/store/trainer.store';
 
 export const Header = () => {
   const navigate = useNavigate();
   const { user, logout, fetchMe } = useAuthStore();
+  const { trainer } = useTrainerStore();
   const { success, error: toastError } = useCustomToast();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -128,6 +130,25 @@ export const Header = () => {
                   >
                     {user.role}
                   </span>
+
+                  {/* Trainer Status Badge */}
+                  {isTrainer && trainer && (
+                    <span
+                      className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded border flex items-center gap-1 ${
+                        trainer.isActive
+                          ? 'bg-[#4ade80]/20 text-[#4ade80] border-[#4ade80]/30'
+                          : 'bg-[#ef4444]/20 text-[#ef4444] border-[#ef4444]/30'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-2 w-2 rounded-full ${
+                          trainer.isActive ? 'bg-[#4ade80]' : 'bg-[#ef4444]'
+                        }`}
+                      ></span>
+                      {trainer.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  )}
+
                   {user.isPremium && (
                     <span className='text-xs font-bold uppercase tracking-wider px-2 py-1 rounded border bg-amber-500/20 text-amber-400 border-amber-500/30 flex items-center gap-1'>
                       ⭐ Premium

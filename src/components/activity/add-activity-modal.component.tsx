@@ -170,8 +170,8 @@ export const AddActivityModal = ({ isOpen, onClose, onAdd }: AddActivityModalPro
                           : level === 'Medium'
                             ? 'border-amber-500/50'
                             : 'border-red-500/50'
-                      } shadow-lg`
-                    : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                      } shadow-lg text-white`
+                    : 'bg-white/10 text-gray-400 hover:bg-white/15'
                 }`}
               >
                 {getIntensityIcon(level)}
@@ -211,9 +211,28 @@ export const AddActivityModal = ({ isOpen, onClose, onAdd }: AddActivityModalPro
               id='isNow'
               checked={isNow}
               onChange={e => setIsNow(e.target.checked)}
-              className='w-4 h-4 rounded cursor-pointer'
+              className='hidden'
             />
-            <label htmlFor='isNow' className='text-gray-400 text-sm font-medium cursor-pointer'>
+
+            <label
+              htmlFor='isNow'
+              className={`
+                relative w-11 h-6 rounded-full cursor-pointer transition-all duration-300
+                ${isNow ? 'bg-[#d98a9d]/70 shadow-inner shadow-[#d98a9d]/40' : 'bg-white/10'}
+              `}
+            >
+              <span
+                className={`
+                  absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full transition-all duration-300
+                  ${isNow ? 'translate-x-5 bg-white shadow-md' : 'translate-x-1 bg-gray-300/80'}
+                `}
+              />
+            </label>
+
+            <label
+              htmlFor='isNow'
+              className='text-gray-400 text-sm font-medium cursor-pointer select-none'
+            >
               Log as now
             </label>
           </div>

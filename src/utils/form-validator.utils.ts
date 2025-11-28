@@ -338,8 +338,6 @@ export class FormValidator {
     return undefined;
   }
 
-  // Добавь эти методы в FormValidator класс:
-
   /**
    * Validate age
    * Requirements:
@@ -393,8 +391,6 @@ export class FormValidator {
 
     return undefined;
   }
-
-  // Добавить в класс FormValidator эти методы:
 
   /**
    * Validate activity type

@@ -25,6 +25,7 @@ interface EditTrainerModalProps {
     bio: string;
     specialization: string;
     location: string;
+    isActive?: boolean;
   };
   isLoading?: boolean;
 }
@@ -60,7 +61,7 @@ export const EditTrainerModal = ({
   const [bio, setBio] = useState('');
   const [specialization, setSpecialization] = useState('');
   const [location, setLocation] = useState('');
-
+  const [isActive, setIsActive] = useState(true);
   const [formDataPasswordChange, setFormDataPasswordChange] = useState<FormDataPasswordChange>({
     newPassword: '',
     confirmPassword: '',
@@ -82,6 +83,7 @@ export const EditTrainerModal = ({
       setBio(initialData.bio || '');
       setSpecialization(initialData.specialization || '');
       setLocation(initialData.location || '');
+      setIsActive(initialData.isActive ?? true);
       setErrors({});
       setTouched(new Set());
       setActiveTab('personal');
@@ -233,6 +235,7 @@ export const EditTrainerModal = ({
           bio,
           specialization,
           location,
+          isActive,
         };
 
         const userSuccess = await updateUser(userData);
@@ -299,7 +302,6 @@ export const EditTrainerModal = ({
       }
     }
   };
-
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 backdrop-blur-sm p-3 sm:p-4'>
       <div className='relative w-full max-w-4xl rounded-2xl border border-white/10 bg-[#1e1416] shadow-2xl shadow-[#D98A9D]/5 max-h-[95vh] overflow-y-auto'>
@@ -618,6 +620,30 @@ export const EditTrainerModal = ({
                       )}
                     </div>
                   </div>
+                  {/* Activity Status Checkbox */}
+                  <div className='flex items-start gap-4 rounded-lg border border-white/10 bg-black/30 p-4 sm:p-6'>
+                    <input
+                      type='checkbox'
+                      id='isActive'
+                      checked={isActive}
+                      onChange={e => setIsActive(e.target.checked)}
+                      disabled={isSaving}
+                      className='mt-1 h-5 w-5 cursor-pointer rounded border border-[#D98A9D]/40 bg-[#141414] accent-[#D98A9D] transition-colors hover:border-[#D98A9D]/60 disabled:opacity-50 disabled:cursor-not-allowed'
+                    />
+                    <div className='flex-1'>
+                      <label
+                        htmlFor='isActive'
+                        className='text-sm sm:text-base font-semibold text-white cursor-pointer'
+                      >
+                        Active Status
+                      </label>
+                      <p className='mt-1 text-xs sm:text-sm text-gray-400'>
+                        {isActive
+                          ? '🟢 You are currently accepting new clients'
+                          : '🔴 You are not accepting new clients'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -761,29 +787,50 @@ export const EditTrainerModal = ({
                   src={avatarPreview || 'https://via.placeholder.com/112'}
                 />
                 <h2 className='mt-4 sm:mt-6 text-xl sm:text-3xl font-black leading-tight text-white'>
-                  {fullName || '–'}
+                  {fullName || 'â€"'}
                 </h2>
+
+                {/* Activity Status Badge in Preview */}
+                <div
+                  className={`mt-2 sm:mt-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] sm:text-xs font-bold transition-all ${
+                    isActive
+                      ? 'bg-[#4ade80]/20 text-[#4ade80] border-[#4ade80]/30'
+                      : 'bg-[#ef4444]/20 text-[#ef4444] border-[#ef4444]/30'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-1.5 w-1.5 rounded-full ${
+                      isActive ? 'bg-[#4ade80]' : 'bg-[#ef4444]'
+                    }`}
+                  ></span>
+                  {isActive ? 'Active' : 'Inactive'}
+                </div>
+
                 <p className='mt-2 sm:mt-3 text-xs sm:text-sm text-gray-400'>Trainer</p>
 
                 <div className='mt-4 sm:mt-8 w-full space-y-2 sm:space-y-4 border-t border-white/10 pt-4 sm:pt-8'>
                   <div className='text-center'>
                     <p className='text-[10px] sm:text-xs font-medium text-gray-400'>Age</p>
                     <p className='mt-1 sm:mt-2 text-xs sm:text-sm font-bold text-white'>
-                      {age || '–'}
+                      {age || 'â€"'}
                     </p>
                   </div>
                   <div className='text-center'>
                     <p className='text-[10px] sm:text-xs font-medium text-gray-400'>Height</p>
                     <p className='mt-1 sm:mt-2 text-xs sm:text-sm font-bold text-white'>
-                      {height || '–'}{' '}
-                      <span className='text-[9px] sm:text-xs font-normal text-gray-400'>cm</span>
+                      {height || 'â€"'}
+                      <span className='text-[9px] sm:text-xs font-normal text-gray-400 block'>
+                        cm
+                      </span>
                     </p>
                   </div>
                   <div className='text-center'>
                     <p className='text-[10px] sm:text-xs font-medium text-gray-400'>Weight</p>
                     <p className='mt-1 sm:mt-2 text-xs sm:text-sm font-bold text-white'>
-                      {weight || '–'}{' '}
-                      <span className='text-[9px] sm:text-xs font-normal text-gray-400'>kg</span>
+                      {weight || 'â€"'}
+                      <span className='text-[9px] sm:text-xs font-normal text-gray-400 block'>
+                        kg
+                      </span>
                     </p>
                   </div>
                   <div className='pt-2 sm:pt-4 border-t border-white/10'>
@@ -791,13 +838,13 @@ export const EditTrainerModal = ({
                       Specialization
                     </p>
                     <p className='mt-1 sm:mt-2 text-xs sm:text-sm font-bold text-white line-clamp-1'>
-                      {specialization || '–'}
+                      {specialization || 'â€"'}
                     </p>
                   </div>
                   <div className='text-center'>
                     <p className='text-[10px] sm:text-xs font-medium text-gray-400'>Location</p>
                     <p className='mt-1 sm:mt-2 text-xs sm:text-sm font-bold text-white line-clamp-1'>
-                      {location || '–'}
+                      {location || 'â€"'}
                     </p>
                   </div>
                   {bio && (

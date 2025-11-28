@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as TrainersRouteImport } from './routes/trainers'
 import { Route as TrainerProfileRouteImport } from './routes/trainer-profile'
 import { Route as SleepRouteImport } from './routes/sleep'
 import { Route as RegisterRouteImport } from './routes/register'
@@ -20,10 +21,17 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UserIdRouteImport } from './routes/user.$id'
+import { Route as TrainerIdRouteImport } from './routes/trainer.$id'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
   path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrainersRoute = TrainersRouteImport.update({
+  id: '/trainers',
+  path: '/trainers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TrainerProfileRoute = TrainerProfileRouteImport.update({
@@ -76,6 +84,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UserIdRoute = UserIdRouteImport.update({
+  id: '/user/$id',
+  path: '/user/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrainerIdRoute = TrainerIdRouteImport.update({
+  id: '/trainer/$id',
+  path: '/trainer/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -88,7 +106,10 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/sleep': typeof SleepRoute
   '/trainer-profile': typeof TrainerProfileRoute
+  '/trainers': typeof TrainersRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/trainer/$id': typeof TrainerIdRoute
+  '/user/$id': typeof UserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -101,7 +122,10 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/sleep': typeof SleepRoute
   '/trainer-profile': typeof TrainerProfileRoute
+  '/trainers': typeof TrainersRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/trainer/$id': typeof TrainerIdRoute
+  '/user/$id': typeof UserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,7 +139,10 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/sleep': typeof SleepRoute
   '/trainer-profile': typeof TrainerProfileRoute
+  '/trainers': typeof TrainersRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/trainer/$id': typeof TrainerIdRoute
+  '/user/$id': typeof UserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,7 +157,10 @@ export interface FileRouteTypes {
     | '/register'
     | '/sleep'
     | '/trainer-profile'
+    | '/trainers'
     | '/verify-email'
+    | '/trainer/$id'
+    | '/user/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -143,7 +173,10 @@ export interface FileRouteTypes {
     | '/register'
     | '/sleep'
     | '/trainer-profile'
+    | '/trainers'
     | '/verify-email'
+    | '/trainer/$id'
+    | '/user/$id'
   id:
     | '__root__'
     | '/'
@@ -156,7 +189,10 @@ export interface FileRouteTypes {
     | '/register'
     | '/sleep'
     | '/trainer-profile'
+    | '/trainers'
     | '/verify-email'
+    | '/trainer/$id'
+    | '/user/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -170,7 +206,10 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   SleepRoute: typeof SleepRoute
   TrainerProfileRoute: typeof TrainerProfileRoute
+  TrainersRoute: typeof TrainersRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  TrainerIdRoute: typeof TrainerIdRoute
+  UserIdRoute: typeof UserIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -180,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/verify-email'
       fullPath: '/verify-email'
       preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trainers': {
+      id: '/trainers'
+      path: '/trainers'
+      fullPath: '/trainers'
+      preLoaderRoute: typeof TrainersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/trainer-profile': {
@@ -252,6 +298,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/user/$id': {
+      id: '/user/$id'
+      path: '/user/$id'
+      fullPath: '/user/$id'
+      preLoaderRoute: typeof UserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trainer/$id': {
+      id: '/trainer/$id'
+      path: '/trainer/$id'
+      fullPath: '/trainer/$id'
+      preLoaderRoute: typeof TrainerIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -266,7 +326,10 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   SleepRoute: SleepRoute,
   TrainerProfileRoute: TrainerProfileRoute,
+  TrainersRoute: TrainersRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  TrainerIdRoute: TrainerIdRoute,
+  UserIdRoute: UserIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -4,6 +4,7 @@ import { ProfileEditModal } from './profile-edit-modal.component';
 import { useAuthStore } from '@/store/auth.store';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
 import type { User } from '@/types/auth.types';
+import { Link } from '@tanstack/react-router';
 
 interface ProfileComponentProps {
   user?: User;
@@ -122,13 +123,14 @@ export const ProfileComponent = ({ user, onProfileUpdate }: ProfileComponentProp
                 </p>
               </div>
             </div>
-            <button
-              disabled
-              type='button'
-              className='mt-6 w-full transform rounded-lg bg-[#D98A9D]/20 px-4 py-3 text-sm font-bold text-[#D98A9D] border border-[#D98A9D]/30 transition-all duration-300 hover:bg-[#D98A9D]/30 opacity-60 cursor-not-allowed'
-            >
-              Coming Soon
-            </button>
+            <Link to='/nutrition'>
+              <button
+                type='button'
+                className='mt-6 w-full transform rounded-lg bg-[#D98A9D] px-4 py-3 text-sm font-bold text-white border border-[#D98A9D]/30 transition-all duration-300 hover:bg-[#c87b8f]/70 hover:scale-[1.02]  flex items-center justify-center gap-2'
+              >
+                Open Nutrition <ArrowRight size={18} />
+              </button>
+            </Link>
           </div>
 
           {/* Sleep */}
@@ -144,13 +146,14 @@ export const ProfileComponent = ({ user, onProfileUpdate }: ProfileComponentProp
                 </p>
               </div>
             </div>
-            <button
-              disabled
-              type='button'
-              className='mt-6 w-full transform rounded-lg bg-[#D98A9D]/20 px-4 py-3 text-sm font-bold text-[#D98A9D] border border-[#D98A9D]/30 transition-all duration-300 hover:bg-[#D98A9D]/30 opacity-60 cursor-not-allowed'
-            >
-              Coming Soon
-            </button>
+            <Link to='/sleep'>
+              <button
+                type='button'
+                className='mt-6 w-full transform rounded-lg bg-[#D98A9D] px-4 py-3 text-sm font-bold text-white border border-[#D98A9D]/30 transition-all duration-300 hover:bg-[#c87b8f]/70 hover:scale-[1.02]  flex items-center justify-center gap-2'
+              >
+                Open Sleep <ArrowRight size={18} />
+              </button>
+            </Link>
           </div>
 
           {/* Activity */}
@@ -166,13 +169,14 @@ export const ProfileComponent = ({ user, onProfileUpdate }: ProfileComponentProp
                 </p>
               </div>
             </div>
-            <button
-              disabled
-              type='button'
-              className='mt-6 w-full transform rounded-lg bg-[#D98A9D]/20 px-4 py-3 text-sm font-bold text-[#D98A9D] border border-[#D98A9D]/30 transition-all duration-300 hover:bg-[#D98A9D]/30 opacity-60 cursor-not-allowed'
-            >
-              Coming Soon
-            </button>
+            <Link to='/activity'>
+              <button
+                type='button'
+                className='mt-6 w-full transform rounded-lg bg-[#D98A9D] px-4 py-3 text-sm font-bold text-white border border-[#D98A9D]/30 transition-all duration-300 hover:bg-[#c87b8f]/70 hover:scale-[1.02]  flex items-center justify-center gap-2'
+              >
+                Open Activity <ArrowRight size={18} />
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -188,13 +192,15 @@ export const ProfileComponent = ({ user, onProfileUpdate }: ProfileComponentProp
                 Connect with your personal trainer for guidance and support
               </p>
             </div>
-            <button
-              disabled
-              type='button'
-              className='transform rounded-lg bg-[#D98A9D]/20 px-8 py-3 text-base font-bold text-[#D98A9D] border border-[#D98A9D]/30 transition-all duration-300 hover:bg-[#D98A9D]/30 opacity-60 cursor-not-allowed flex items-center gap-2 whitespace-nowrap'
-            >
-              Open Chat <ArrowRight size={18} />
-            </button>
+            <Link to='/'>
+              <button
+                disabled
+                type='button'
+                className='transform rounded-lg bg-[#D98A9D]/20 px-8 py-3 text-base font-bold text-[#D98A9D] border border-[#D98A9D]/30 transition-all duration-300 hover:bg-[#D98A9D]/30 opacity-60 cursor-not-allowed flex items-center gap-2 whitespace-nowrap'
+              >
+                Open Chat <ArrowRight size={18} />
+              </button>
+            </Link>
           </div>
         </div>
 

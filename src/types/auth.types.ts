@@ -79,3 +79,8 @@ export interface GoogleAuthRequest {
   code: string;
   role: UserRole;
 }
+
+export interface GetUserResponse {
+  message: string;
+  user: User;
+}
