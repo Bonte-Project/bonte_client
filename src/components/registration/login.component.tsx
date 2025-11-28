@@ -8,7 +8,7 @@ import { FormValidator } from '@/utils/form-validator.utils';
 import { Eye, EyeOff } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 import { AuthFeaturesPanel } from './auth-features-panel';
-import { AuthLayout } from './layouts/auth.layout';
+import { AuthLayout } from '../layouts/auth.layout';
 
 interface FormData {
   email: string;
@@ -117,7 +117,7 @@ export const LoginForm = () => {
         success('Logged In Successfully', {
           description: 'Redirecting to dashboard...',
         });
-        setTimeout(() => void navigate({ to: '/' }), 1500);
+        setTimeout(() => void navigate({ to: '/profile' }), 500);
       }
     })();
   };
@@ -140,7 +140,7 @@ export const LoginForm = () => {
           success('Login Successful!', {
             description: 'Welcome back to Bonté. Redirecting...',
           });
-          setTimeout(() => void navigate({ to: '/' }), 1500);
+          setTimeout(() => void navigate({ to: '/profile' }), 500);
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Google authentication failed';

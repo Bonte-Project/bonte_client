@@ -1,4 +1,4 @@
-import { PublicTrainerProfileComponent } from '@/components/public-trainer-profile.component';
+import { PublicTrainerProfileComponent } from '@/components/trainer-profile/public-trainer-profile.component';
 interface PublicTrainerProfileComponentProps {
   id: string;
 }

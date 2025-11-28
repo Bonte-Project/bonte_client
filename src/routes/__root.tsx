@@ -45,7 +45,7 @@ export const Route = createRootRoute({
     if (currentUser && (location.pathname === '/login' || location.pathname === '/register')) {
       // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw redirect({
-        to: '/',
+        to: '/profile',
       });
     }
   },

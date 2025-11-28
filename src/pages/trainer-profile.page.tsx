@@ -1,4 +1,4 @@
-import { TrainerProfileComponent } from '@/components/trainer-profile.component.tsx';
+import { TrainerProfileComponent } from '@/components/trainer-profile/trainer-profile.component';
 
 const TrainerProfilePage = () => {
   return (

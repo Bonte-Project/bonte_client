@@ -14,7 +14,7 @@ function RouteComponent() {
 
   useEffect(() => {
     if (!user) {
-      void navigate({ to: '/' });
+      void navigate({ to: '/login' });
       return;
     }
 
@@ -23,7 +23,7 @@ function RouteComponent() {
         void navigate({ to: '/' });
         break;
       case 'trainer':
-        void navigate({ to: '/' });
+        void navigate({ to: '/trainer-profile' });
         break;
     }
   }, [user, navigate]);

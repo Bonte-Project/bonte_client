@@ -1,4 +1,4 @@
-import { ProfileComponent } from '@/components/profile.component.tsx';
+import { ProfileComponent } from '@/components/user-profile/profile.component';
 
 const ProfilePage = () => {
   return (

@@ -9,7 +9,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import type { UserRole } from '@/types/auth.types';
 import { GoogleLogin } from '@react-oauth/google';
 import { AuthFeaturesPanel } from './auth-features-panel';
-import { AuthLayout } from './layouts/auth.layout';
+import { AuthLayout } from '../layouts/auth.layout';
 
 interface FormData {
   fullName: string;
@@ -179,8 +179,8 @@ export const RegisterForm = () => {
           });
 
           setTimeout(() => {
-            void navigate({ to: '/' });
-          }, 1500);
+            void navigate({ to: '/profile' });
+          }, 500);
         }
       } catch (err) {
         console.error('Google auth error:', err);

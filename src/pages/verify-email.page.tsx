@@ -1,4 +1,4 @@
-import { VerifyEmailForm } from '@/components/verify-email.component.tsx';
+import { VerifyEmailForm } from '@/components/registration/verify-email.component';
 
 const VerifyEmailPage = () => {
   return (

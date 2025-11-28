@@ -14,7 +14,7 @@ function RouteComponent() {
 
   useEffect(() => {
     if (!user) {
-      void navigate({ to: '/' });
+      void navigate({ to: '/login' });
       return;
     }
 

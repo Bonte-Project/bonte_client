@@ -1,8 +1,8 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { AuthFeaturesPanel } from './auth-features-panel';
-import { AuthLayout } from './layouts/auth.layout';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
+import { AuthLayout } from '../layouts/auth.layout';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '@/store/auth.store';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';

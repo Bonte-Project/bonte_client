@@ -9,11 +9,9 @@ import {
   TrendingUp,
   UtensilsCrossed,
   Dumbbell,
-  Plus,
   Settings,
   HelpCircle,
   Sparkles,
-  User,
   AlarmClock,
 } from 'lucide-react';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
@@ -51,7 +49,7 @@ export const Header = () => {
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/dashboard' },
+    { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/trainers' },
     { id: 'trends', label: 'Trends', icon: TrendingUp, href: '/trends' },
     { id: 'nutrition', label: 'Nutrition', icon: UtensilsCrossed, href: '/nutrition' },
     { id: 'activity', label: 'Activity', icon: Dumbbell, href: '/activity' },
@@ -59,8 +57,8 @@ export const Header = () => {
   ];
 
   const trainerNavItems = [
-    { id: 'trainer-profile', label: 'My Profile', icon: User, href: '/trainer-profile' },
     { id: 'clients', label: 'Clients', icon: Dumbbell, href: '/trainer/clients' },
+    { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/trainers' },
   ];
 
   const getRoleBadgeColor = (role: string) => {
@@ -203,47 +201,48 @@ export const Header = () => {
               )}
 
               {/* Regular user navigation */}
-              {navItems.map(item => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.id}>
-                    {user ? (
-                      <Link to={item.href} onClick={closeMobileMenu}>
-                        <Button
-                          variant='ghost'
-                          className='w-full justify-start text-white hover:bg-white/10 hover:text-[#D98A9D] transition-colors'
-                        >
-                          <Icon size={20} className='mr-3 text-[#D98A9D]' />
-                          {item.label}
-                        </Button>
-                      </Link>
-                    ) : (
-                      <div className='group relative'>
-                        <Button
-                          variant='ghost'
-                          disabled
-                          className='w-full justify-start text-white/50 cursor-not-allowed'
-                        >
-                          <Icon size={20} className='mr-3 text-[#D98A9D]/50' />
-                          {item.label}
-                        </Button>
-                        {/* Tooltip */}
-                        <div className='absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-[#D98A9D] text-white text-xs font-medium px-3 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg'>
-                          Sign in to access
-                          <div className='absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#D98A9D]'></div>
+              {!isTrainer &&
+                navItems.map(item => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.id}>
+                      {user ? (
+                        <Link to={item.href} onClick={closeMobileMenu}>
+                          <Button
+                            variant='ghost'
+                            className='w-full justify-start text-white hover:bg-white/10 hover:text-[#D98A9D] transition-colors'
+                          >
+                            <Icon size={20} className='mr-3 text-[#D98A9D]' />
+                            {item.label}
+                          </Button>
+                        </Link>
+                      ) : (
+                        <div className='group relative'>
+                          <Button
+                            variant='ghost'
+                            disabled
+                            className='w-full justify-start text-white/50 cursor-not-allowed'
+                          >
+                            <Icon size={20} className='mr-3 text-[#D98A9D]/50' />
+                            {item.label}
+                          </Button>
+                          {/* Tooltip */}
+                          <div className='absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-[#D98A9D] text-white text-xs font-medium px-3 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg'>
+                            Sign in to access
+                            <div className='absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#D98A9D]'></div>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                      )}
+                    </div>
+                  );
+                })}
             </nav>
           </div>
 
           {/* Bottom Section */}
           <div className='flex flex-col gap-4'>
             {/* Log Workout Button - Only for regular users */}
-            {user && !isTrainer && (
+            {/* {user && !isTrainer && (
               <Link to='/'>
                 <Button
                   className='w-full bg-[#D98A9D] hover:bg-[#c87b8f] text-white'
@@ -253,7 +252,7 @@ export const Header = () => {
                   Log Workout
                 </Button>
               </Link>
-            )}
+            )} */}
 
             {/* Settings and Help Section */}
             <div className='flex flex-col gap-1 border-t border-white/10 pt-4'>

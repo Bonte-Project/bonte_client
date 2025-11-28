@@ -1,4 +1,4 @@
-import { PublicProfileComponent } from '@/components/public-profile.component';
+import { PublicProfileComponent } from '@/components/user-profile/public-profile.component';
 
 interface PublicProfileComponentProps {
   id: string;
