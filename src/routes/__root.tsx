@@ -1,14 +1,25 @@
-import { createRootRoute, Outlet, redirect } from '@tanstack/react-router';
+import { createRootRoute, Outlet, redirect, useRouterState } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import Layout from '@/components/layout.component';
 import { useAuthStore } from '@/store/auth.store';
+import { Header } from '@/components/header.component';
 
 const RootLayout = () => {
+  const routerState = useRouterState();
+  const isChatPage = routerState.location.pathname.startsWith('/chat');
+
   return (
     <>
-      <Layout>
-        <Outlet />
-      </Layout>
+      {isChatPage ? (
+        <>
+          <Header />
+          <Outlet />
+        </>
+      ) : (
+        <Layout>
+          <Outlet />
+        </Layout>
+      )}
       <TanStackRouterDevtools />
     </>
   );
