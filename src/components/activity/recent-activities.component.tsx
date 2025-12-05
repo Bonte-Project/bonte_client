@@ -86,48 +86,16 @@ export const RecentActivities = ({ logs, onDelete, isLoading = false }: RecentAc
 
   return (
     <div className='bg-[#1a0F16] border border-[#36282F] rounded-2xl p-8 h-full flex flex-col'>
-      <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6'>
-        <h3 className='text-xl sm:text-2xl font-bold text-white'>Recent Activities</h3>
-        <div className='flex flex-wrap gap-2'>
-          <button
-            onClick={() => setPeriod('today')}
-            className={`px-3 py-1.5 text-xs sm:text-sm rounded-lg font-medium transition-all whitespace-nowrap ${
-              period === 'today'
-                ? 'bg-[#d98a9d] text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10'
-            }`}
-          >
-            Today
-          </button>
-          <button
-            onClick={() => setPeriod('7days')}
-            className={`px-3 py-1.5 text-xs sm:text-sm rounded-lg font-medium transition-all whitespace-nowrap ${
-              period === '7days'
-                ? 'bg-[#d98a9d] text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10'
-            }`}
-          >
-            7 Days
-          </button>
-          <button
-            onClick={() => setPeriod('30days')}
-            className={`px-3 py-1.5 text-xs sm:text-sm rounded-lg font-medium transition-all whitespace-nowrap ${
-              period === '30days'
-                ? 'bg-[#d98a9d] text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10'
-            }`}
-          >
-            30 Days
-          </button>
-        </div>
-      </div>
+      {/* Заголовок сверху */}
+      <h3 className='text-xl sm:text-2xl font-bold text-white mb-6'>Recent Activities</h3>
 
-      {isLoading ? (
-        <div className='flex-1 min-h-0'>
-          <RecentActivitiesSkeleton />
-        </div>
-      ) : (
-        <div className='flex-1 overflow-hidden flex flex-col'>
+      {/* Список активности посередине */}
+      <div className='flex-1 overflow-hidden flex flex-col'>
+        {isLoading ? (
+          <div className='flex-1 min-h-0'>
+            <RecentActivitiesSkeleton />
+          </div>
+        ) : (
           <div className='flex-1 overflow-y-auto space-y-4 min-h-0 pr-2'>
             {filteredLogs.length === 0 ? (
               <div className='text-center py-12'>
@@ -175,8 +143,42 @@ export const RecentActivities = ({ logs, onDelete, isLoading = false }: RecentAc
               ))
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
+      {/* Кнопки выбора периода внизу */}
+      <div className='flex justify-center gap-4 mt-6 flex-nowrap'>
+        <button
+          onClick={() => setPeriod('today')}
+          className={`px-6 py-3 text-base rounded-xl font-semibold transition-all ${
+            period === 'today'
+              ? 'bg-[#d98a9d] text-white'
+              : 'bg-white/5 text-gray-400 hover:bg-white/10'
+          }`}
+        >
+          Today
+        </button>
+        <button
+          onClick={() => setPeriod('7days')}
+          className={`px-6 py-3 text-base rounded-xl font-semibold transition-all ${
+            period === '7days'
+              ? 'bg-[#d98a9d] text-white'
+              : 'bg-white/5 text-gray-400 hover:bg-white/10'
+          }`}
+        >
+          7 Days
+        </button>
+        <button
+          onClick={() => setPeriod('30days')}
+          className={`px-6 py-3 text-base rounded-xl font-semibold transition-all ${
+            period === '30days'
+              ? 'bg-[#d98a9d] text-white'
+              : 'bg-white/5 text-gray-400 hover:bg-white/10'
+          }`}
+        >
+          30 Days
+        </button>
+      </div>
     </div>
   );
 };

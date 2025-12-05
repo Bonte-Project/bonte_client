@@ -61,6 +61,7 @@ export const Header = () => {
   const trainerNavItems = [
     { id: 'clients', label: 'Clients', icon: Dumbbell, href: '/trainer/clients' },
     { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/trainers' },
+    { id: 'chat', label: 'Chat', icon: MessageSquare, href: '/chat' },
   ];
 
   const getRoleBadgeColor = (role: string) => {

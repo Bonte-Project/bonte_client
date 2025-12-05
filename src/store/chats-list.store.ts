@@ -6,7 +6,7 @@ interface ChatListStore {
   selectedChatId: string | null;
   isLoading: boolean;
 
-  fetchChats: () => Promise<void>;
+  fetchChats: () => void;
   selectChat: (id: string) => void;
   getSelectedChat: () => ChatContact | undefined;
 }
@@ -16,7 +16,7 @@ export const useChatListStore = create<ChatListStore>((set, get) => ({
   selectedChatId: null,
   isLoading: false,
 
-  fetchChats: async () => {
+  fetchChats: () => {
     set({ isLoading: true });
 
     const aiChat: ChatContact = {

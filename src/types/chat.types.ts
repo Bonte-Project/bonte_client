@@ -2,7 +2,7 @@ export interface ChatContact {
   id: string;
   type: 'ai' | 'trainer' | 'human';
   name: string;
-  avatar: string;
+  avatar?: string;
   status: 'online' | 'offline' | 'typing';
   lastMessage?: string;
   lastSeen?: string;

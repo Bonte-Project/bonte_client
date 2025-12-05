@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 import { useTrainerStore } from '@/store/trainer.store';
 import { useUserStore } from '@/store/user.store';
+import { useAuthStore } from '@/store/auth.store';
+import { MessageTrainerButton } from '@/components/chat/message-trainer-button.component';
 
 interface Certification {
   id: string;
@@ -16,6 +18,7 @@ interface PublicTrainerProfileComponentProps {
 
 export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileComponentProps) => {
   const navigate = useNavigate();
+  const { user: currentUser } = useAuthStore();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date().getDate());
   const [certifications, setCertifications] = useState<Certification[]>([]);
@@ -74,7 +77,7 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
   };
 
   const formatDateDisplay = (dateString: string | undefined): string => {
-    if (!dateString) return '—';
+    if (!dateString) return '–';
 
     if (dateString.includes('T')) {
       const date = new Date(dateString);
@@ -174,6 +177,8 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
     );
   }
 
+  const isOwnProfile = currentUser?.id === trainer.userId;
+
   return (
     <div className='relative min-h-screen w-full overflow-hidden bg-[#1e1416]'>
       <div className='absolute inset-0 z-0'>
@@ -204,7 +209,6 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
                   <h1 className='text-3xl font-black leading-tight tracking-tight text-white'>
                     {user?.fullName}
                   </h1>
-                  {/* Activity Status Badge */}
                   <div
                     className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs sm:text-sm font-bold transition-all ${
                       trainer.isActive
@@ -226,6 +230,12 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
                 )}
               </div>
             </div>
+
+            {!isOwnProfile && (
+              <div className='w-full lg:w-auto'>
+                <MessageTrainerButton trainerId={id} />
+              </div>
+            )}
           </div>
 
           <div className='mt-8 grid grid-cols-3 gap-4 border-t border-white/10 pt-8 sm:grid-cols-3 lg:grid-cols-6'>
@@ -252,13 +262,13 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
                 Specialization
               </p>
               <p className='mt-3 text-sm font-bold text-white truncate'>
-                {trainer.specialization || '—'}
+                {trainer.specialization || '–'}
               </p>
             </div>
             <div className='rounded-lg bg-black/30 p-4 text-center'>
               <p className='text-xs font-medium text-gray-400 uppercase tracking-wide'>Location</p>
               <p className='mt-3 text-sm font-bold text-white truncate'>
-                {trainer.location || '—'}
+                {trainer.location || '–'}
               </p>
             </div>
             <div className='rounded-lg bg-black/30 p-4 text-center'>
