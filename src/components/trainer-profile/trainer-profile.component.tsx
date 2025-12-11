@@ -3,17 +3,29 @@ import { Edit2, Trash2, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTrainerStore } from '@/store/trainer.store';
 import { useAuthStore } from '@/store/auth.store';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
+import { useTrainerMessagesStore } from '@/store/trainer-messages.store';
+import { useUserStore } from '@/store/user.store';
 import {
   EditTrainerModal,
   AddCertificationModal,
   ExperienceModal,
 } from './trainer-modals.component';
+import { TrainingSessionModal } from './training-session-modal.component';
+import { SessionDetailsModal } from './session-details-modal.component';
 import type { CreateExperienceRequest, UpdateExperienceRequest } from '@/types/trainer.types';
+import type { TrainingSession } from '@/types/training-sessions.types';
+import { format } from 'date-fns';
 
 interface Certification {
   id: string;
   name: string;
   url: string;
+}
+
+interface UserOption {
+  id: string;
+  name: string;
+  avatar?: string;
 }
 
 export const TrainerProfileComponent = () => {
@@ -22,12 +34,19 @@ export const TrainerProfileComponent = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCertModal, setShowCertModal] = useState(false);
   const [showExperienceModal, setShowExperienceModal] = useState(false);
+  const [showSessionModal, setShowSessionModal] = useState(false);
   const [editingExperienceId, setEditingExperienceId] = useState<string | null>(null);
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [editingCertId, setEditingCertId] = useState<string | null>(null);
   const [editingExperienceData, setEditingExperienceData] = useState<
     UpdateExperienceRequest | undefined
   >();
+  const [userOptions, setUserOptions] = useState<UserOption[]>([]);
+  const [showSessionDetailsModal, setShowSessionDetailsModal] = useState(false);
+  const [selectedSessionForDetails, setSelectedSessionForDetails] =
+    useState<TrainingSession | null>(null);
+
   const {
     trainer,
     isLoading,
@@ -36,13 +55,19 @@ export const TrainerProfileComponent = () => {
     deleteExperience,
     getMyTrainer,
     updateTrainer,
+    trainingSessions,
+    getTrainingSessions,
+    deleteTrainingSession,
   } = useTrainerStore();
   const { user } = useAuthStore();
   const { success, error: toastError } = useCustomToast();
+  const { chatPartnerIds, getChatsListIds } = useTrainerMessagesStore();
+  const { getUserById } = useUserStore();
 
   useEffect(() => {
     void getMyTrainer();
-  }, [getMyTrainer]);
+    void getTrainingSessions();
+  }, [getMyTrainer, getTrainingSessions]);
 
   useEffect(() => {
     if (trainer?.certification && trainer.certification.trim()) {
@@ -60,12 +85,49 @@ export const TrainerProfileComponent = () => {
   }, [trainer?.certification]);
 
   useEffect(() => {
+    const initChatPartners = async () => {
+      if (!user) return;
+
+      try {
+        await getChatsListIds();
+      } catch (error) {
+        console.error('Failed to load chat partners:', error);
+      }
+    };
+
+    initChatPartners();
+  }, [user, getChatsListIds]);
+
+  useEffect(() => {
+    const loadUserOptions = async () => {
+      if (!chatPartnerIds.length) {
+        setUserOptions([]);
+        return;
+      }
+
+      const loaded: UserOption[] = [];
+
+      for (const partnerId of chatPartnerIds) {
+        try {
+          const partner = await getUserById(partnerId);
+          if (partner) {
+            loaded.push({ id: partner.id, name: partner.fullName, avatar: partner.avatarUrl });
+          }
+        } catch (error) {
+          console.error('Failed to load user:', partnerId, error);
+        }
+      }
+
+      setUserOptions(loaded);
+    };
+
+    loadUserOptions();
+  }, [chatPartnerIds]);
+  useEffect(() => {
     if (editingExperienceId && trainer?.experience && trainer.experience.length > 0) {
       const exp = trainer.experience.find(e => e.id === editingExperienceId);
 
       if (exp) {
-        console.log('Found experience:', exp);
-
         const startDate = exp.startDate?.includes('T')
           ? exp.startDate.substring(0, 7)
           : exp.startDate || '';
@@ -80,15 +142,7 @@ export const TrainerProfileComponent = () => {
           startDate: startDate,
           endDate: endDate,
         });
-
-        console.log('Set data:', {
-          title: exp.title,
-          description: exp.description,
-          startDate,
-          endDate,
-        });
       } else {
-        console.log('Experience not found');
         setEditingExperienceData(undefined);
       }
     } else {
@@ -102,6 +156,18 @@ export const TrainerProfileComponent = () => {
 
   const getFirstDayOfMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+  };
+
+  const getSessionsForSelectedDate = (): TrainingSession[] => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const startOfDay = new Date(year, month, selectedDate, 0, 0, 0);
+    const endOfDay = new Date(year, month, selectedDate, 23, 59, 59);
+
+    return trainingSessions.filter(session => {
+      const sessionDate = new Date(session.scheduledAt);
+      return sessionDate >= startOfDay && sessionDate <= endOfDay;
+    });
   };
 
   const formatDateDisplay = (dateString: string | undefined): string => {
@@ -119,6 +185,24 @@ export const TrainerProfileComponent = () => {
     }
 
     return dateString;
+  };
+
+  const formatSessionDateTime = (dateString: string): string => {
+    const date = new Date(dateString);
+    return format(date, 'HH:mm');
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'scheduled':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      case 'completed':
+        return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'cancelled':
+        return 'bg-red-500/20 text-red-400 border-red-500/30';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    }
   };
 
   const renderCalendar = () => {
@@ -141,17 +225,29 @@ export const TrainerProfileComponent = () => {
 
     for (let i = 1; i <= daysInMonth; i++) {
       const isSelected = i === selectedDate;
+      const hasSessionsOnDay = trainingSessions.some(session => {
+        const sessionDate = new Date(session.scheduledAt);
+        return (
+          sessionDate.getDate() === i &&
+          sessionDate.getMonth() === currentMonth.getMonth() &&
+          sessionDate.getFullYear() === currentMonth.getFullYear()
+        );
+      });
+
       days.push(
         <button
           key={i}
           onClick={() => setSelectedDate(i)}
-          className={`p-2 rounded-lg cursor-pointer transition-all ${
+          className={`p-2 rounded-lg cursor-pointer transition-all relative ${
             isSelected
               ? 'bg-[#D98A9D] text-[#1e1416] font-bold'
               : 'hover:bg-[#D98A9D]/20 text-white'
           }`}
         >
           {i}
+          {hasSessionsOnDay && !isSelected && (
+            <div className='absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#D98A9D] rounded-full'></div>
+          )}
         </button>
       );
     }
@@ -229,6 +325,41 @@ export const TrainerProfileComponent = () => {
       setShowExperienceModal(true);
     }
   };
+
+  const handleAddSession = () => {
+    setEditingSessionId(null);
+    setShowSessionModal(true);
+  };
+
+  const handleEditSession = (sessionId: string) => {
+    setEditingSessionId(sessionId);
+    setShowSessionModal(true);
+  };
+
+  const handleDeleteSession = async (sessionId: string) => {
+    const wasDeleted = await deleteTrainingSession(sessionId);
+
+    if (wasDeleted) {
+      success('Session Deleted', {
+        description: 'Training session has been removed',
+      });
+    }
+  };
+
+  const handleSaveSession = () => {
+    setShowSessionModal(false);
+    setEditingSessionId(null);
+  };
+
+  const handleViewSessionDetails = (session: TrainingSession) => {
+    setSelectedSessionForDetails(session);
+    setShowSessionDetailsModal(true);
+  };
+
+  const sessionsForSelectedDate = getSessionsForSelectedDate();
+  const editingSession = editingSessionId
+    ? trainingSessions.find(s => s.id === editingSessionId)
+    : undefined;
 
   if (!trainer || !user) {
     return (
@@ -380,20 +511,108 @@ export const TrainerProfileComponent = () => {
             </div>
           </div>
 
-          <div className='rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-6'>
-            <h2 className='text-xl font-bold text-white mb-2'>
-              {currentMonth.toLocaleString('default', { month: 'long' })} {selectedDate},{' '}
-              {currentMonth.getFullYear()}
-            </h2>
-            <p className='text-gray-500 text-sm mb-6'>Sessions for selected date</p>
-
-            <div className='space-y-3'>
-              <div className='pt-4 border-t border-white/10'>
-                <div className='rounded-lg bg-[#D98A9D]/10 border border-[#D98A9D]/30 p-4 text-center'>
-                  <p className='text-[#D98A9D] text-sm font-semibold'>Coming Soon</p>
-                  <p className='text-gray-400 text-xs mt-1'>Session management features</p>
-                </div>
+          <div className='rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-6 flex flex-col'>
+            <div className='flex items-center justify-between mb-6'>
+              <div>
+                <h2 className='text-xl font-bold text-white'>
+                  {currentMonth.toLocaleString('default', { month: 'long' })} {selectedDate},{' '}
+                  {currentMonth.getFullYear()}
+                </h2>
+                <p className='text-gray-500 text-sm'>Training sessions for selected date</p>
               </div>
+              <button
+                onClick={handleAddSession}
+                disabled={isLoading}
+                className='flex items-center gap-2 rounded-lg bg-[#D98A9D]/20 px-3 py-2 text-[#D98A9D] text-sm font-bold hover:bg-[#D98A9D]/30 transition-colors disabled:opacity-50'
+              >
+                <Plus size={16} />
+                Add
+              </button>
+            </div>
+
+            <div className='space-y-3 overflow-y-auto max-h-[500px] flex-1 pr-2 scrollbar-thin scrollbar-container'>
+              {sessionsForSelectedDate.length === 0 ? (
+                <div className='pt-4 border-t border-white/10'>
+                  <div className='rounded-lg bg-[#D98A9D]/10 border border-[#D98A9D]/30 p-4 text-center'>
+                    <p className='text-[#D98A9D] text-sm font-semibold'>No sessions</p>
+                    <p className='text-gray-400 text-xs mt-1'>Create a session for this date</p>
+                  </div>
+                </div>
+              ) : (
+                sessionsForSelectedDate.map(session => {
+                  const client = userOptions.find(u => u.id === session.userId);
+
+                  return (
+                    <button
+                      key={session.id}
+                      onClick={() => handleViewSessionDetails(session)}
+                      className='w-full text-left flex items-start gap-3 p-4 rounded-lg bg-black/30 border border-white/10 group hover:border-[#D98A9D]/30 transition-colors'
+                    >
+                      {/* Аватар клиента */}
+                      <div className='flex-shrink-0 mt-1'>
+                        {client?.avatar ? (
+                          <img
+                            src={client.avatar}
+                            alt={client.name}
+                            className='w-10 h-10 rounded-full object-cover border-2 border-[#D98A9D]/20'
+                          />
+                        ) : (
+                          <div className='w-10 h-10 rounded-full bg-[#D98A9D]/20 flex items-center justify-center'>
+                            <span className='text-xs font-bold text-[#D98A9D]'>
+                              {client?.name?.charAt(0).toUpperCase() ?? '?'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Информация о сессии */}
+                      <div className='flex-1 min-w-0'>
+                        <div className='flex items-center gap-3 mb-2 flex-wrap'>
+                          <h3 className='text-sm text-white font-bold break-words line-clamp-1 sm:line-clamp-2'>
+                            {session.name}
+                          </h3>
+                          <span
+                            className={`text-[10px] px-2 py-1 rounded-full border font-semibold flex-shrink-0 ${getStatusColor(
+                              session.status
+                            )}`}
+                          >
+                            {session.status}
+                          </span>
+                        </div>
+
+                        <p className='text-xs text-gray-400 truncate'>
+                          {formatSessionDateTime(session.scheduledAt)}
+                        </p>
+
+                        <p className='text-xs text-gray-500 mt-1 truncate'>
+                          Client: {client?.name || 'Unknown'}
+                        </p>
+                      </div>
+
+                      {/* Кнопки редактирования/удаления — появляются при hover */}
+                      <div
+                        className='flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-4 flex-shrink-0'
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <button
+                          onClick={() => handleEditSession(session.id)}
+                          disabled={isLoading}
+                          className='p-2 hover:bg-white/10 rounded transition-colors disabled:opacity-50'
+                        >
+                          <Edit2 size={16} className='text-gray-400' />
+                        </button>
+                        <button
+                          onClick={() => void handleDeleteSession(session.id)}
+                          disabled={isLoading}
+                          className='p-2 hover:bg-red-500/10 rounded transition-colors disabled:opacity-50'
+                        >
+                          <Trash2 size={16} className='text-red-400' />
+                        </button>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
             </div>
           </div>
         </div>
@@ -568,6 +787,29 @@ export const TrainerProfileComponent = () => {
         initialData={editingExperienceData}
         isLoading={isLoading}
         isEditing={!!editingExperienceId}
+      />
+
+      <TrainingSessionModal
+        isOpen={showSessionModal}
+        onClose={() => {
+          setShowSessionModal(false);
+          setEditingSessionId(null);
+        }}
+        onSave={handleSaveSession}
+        initialData={editingSession}
+        isEditing={!!editingSessionId}
+        users={userOptions}
+      />
+
+      <SessionDetailsModal
+        isOpen={showSessionDetailsModal}
+        onClose={() => {
+          setShowSessionDetailsModal(false);
+          setSelectedSessionForDetails(null);
+        }}
+        session={selectedSessionForDetails}
+        clientName={userOptions.find(u => u.id === selectedSessionForDetails?.userId)?.name}
+        trainerName={user?.fullName}
       />
     </div>
   );

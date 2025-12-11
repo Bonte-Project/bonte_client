@@ -4,8 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/auth.store';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
 import { FormValidator } from '@/utils/form-validator.utils';
-import { Zap, Droplet, Star } from 'lucide-react';
-
+import { BedDouble, Activity, Salad } from 'lucide-react';
 interface FormErrors {
   code?: string;
   general?: string;
@@ -221,35 +220,36 @@ export const VerifyEmailForm = () => {
             <ul className='mt-12 space-y-8'>
               <li className='flex items-start gap-4'>
                 <div className='flex h-12 w-12 items-center justify-center rounded-full bg-[#D98A9D]/10 text-[#D98A9D]'>
-                  <Zap size={24} />
+                  <BedDouble size={24} />
                 </div>
                 <div>
-                  <h3 className='text-lg font-bold'>Strength Tracking</h3>
+                  <h3 className='text-lg font-bold'>Sleep Tracking</h3>
                   <p className='text-gray-400'>
-                    Log every set and rep to monitor your progress and crush your personal records.
+                    Log every sleep to monitor your tendency and analyse your data.
                   </p>
                 </div>
               </li>
               <li className='flex items-start gap-4'>
                 <div className='flex h-12 w-12 items-center justify-center rounded-full bg-[#D98A9D]/10 text-[#D98A9D]'>
-                  <Droplet size={24} />
+                  <Activity size={24} />
                 </div>
                 <div>
-                  <h3 className='text-lg font-bold'>Hydration Reminders</h3>
+                  <h3 className='text-lg font-bold'>Activity Tracking</h3>
                   <p className='text-gray-400'>
-                    Never miss a sip with intelligent reminders that keep you perfectly hydrated all
-                    day.
+                    Never miss an activity, in our app you can easily track it and receive AI
+                    analytics.
                   </p>
                 </div>
               </li>
               <li className='flex items-start gap-4'>
                 <div className='flex h-12 w-12 items-center justify-center rounded-full bg-[#D98A9D]/10 text-[#D98A9D]'>
-                  <Star size={24} />
+                  <Salad size={24} />
                 </div>
                 <div>
-                  <h3 className='text-lg font-bold'>Personal Achievements</h3>
+                  <h3 className='text-lg font-bold'>Nutrition Loging</h3>
                   <p className='text-gray-400'>
-                    Stay motivated by unlocking milestones and celebrating your consistent effort.
+                    Track every bite. Fuel your goals. Our nutrition logging keeps you on the path
+                    to wellness.
                   </p>
                 </div>
               </li>

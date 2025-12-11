@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Send, User } from 'lucide-react';
+import { Send, User, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import Markdown from 'markdown-to-jsx';
@@ -7,6 +7,8 @@ import { MarkdownComponents } from './markdown.component';
 import { format } from 'date-fns';
 import type { TrainerMessage } from '@/types/trainer-messages.types';
 import { useAuthStore } from '@/store/auth.store';
+import { Link } from '@tanstack/react-router';
+import { TrainingSessionModal } from '@/components/trainer-profile/training-session-modal.component';
 
 interface TrainerMessagesWindowProps {
   partnerId: string;
@@ -19,6 +21,7 @@ interface TrainerMessagesWindowProps {
 }
 
 export const TrainerMessagesWindow = ({
+  partnerId,
   partnerName,
   partnerAvatar,
   messages,
@@ -29,6 +32,8 @@ export const TrainerMessagesWindow = ({
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user: currentUser } = useAuthStore();
+
+  const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -64,24 +69,73 @@ export const TrainerMessagesWindow = ({
     }
   };
 
+  const isTrainer = currentUser?.role === 'trainer';
+
   return (
     <div className='flex-1 flex flex-col h-full bg-[#1e1416] overflow-hidden'>
-      <div className='h-20 bg-[#1a0F16] border-b border-white/10 px-6 flex items-center justify-between flex-shrink-0'>
-        <div className='flex items-center gap-4'>
-          <div className='w-12 h-12 rounded-full bg-gradient-to-br from-[#D98A9D] to-[#ec1380] flex items-center justify-center overflow-hidden flex-shrink-0'>
-            {partnerAvatar ? (
-              <img src={partnerAvatar} alt={partnerName} className='w-full h-full object-cover' />
-            ) : (
-              <User className='w-7 h-7 text-white' />
-            )}
-          </div>
-          <div className='min-w-0'>
-            <h2 className='text-white font-semibold text-lg truncate'>{partnerName}</h2>
-            <p className='text-green-400 text-sm'>Online</p>
-          </div>
+      <div className='h-20 bg-[#1a0F16] border-b border-white/10 flex items-center justify-between flex-shrink-0 px-30'>
+        <div className='flex items-center gap-4 flex-1 min-w-0'>
+          {isTrainer ? (
+            <Link
+              to='/user/$id'
+              params={{ id: partnerId }}
+              className='block flex items-center gap-4'
+            >
+              <div className='w-12 h-12 rounded-full bg-gradient-to-br from-[#D98A9D] to-[#ec1380] flex items-center justify-center overflow-hidden flex-shrink-0'>
+                {partnerAvatar ? (
+                  <img
+                    src={partnerAvatar}
+                    alt={partnerName}
+                    className='w-full h-full object-cover'
+                  />
+                ) : (
+                  <User className='w-7 h-7 text-white' />
+                )}
+              </div>
+              <div className='min-w-0'>
+                <h2 className='text-white font-semibold text-lg truncate'>{partnerName}</h2>
+                <p className='text-green-400 text-sm'>Online</p>
+              </div>
+            </Link>
+          ) : (
+            <Link
+              to='/trainer/$id'
+              params={{ id: partnerId }}
+              className='block flex items-center gap-4'
+            >
+              <div className='w-12 h-12 rounded-full bg-gradient-to-br from-[#D98A9D] to-[#ec1380] flex items-center justify-center overflow-hidden flex-shrink-0'>
+                {partnerAvatar ? (
+                  <img
+                    src={partnerAvatar}
+                    alt={partnerName}
+                    className='w-full h-full object-cover'
+                  />
+                ) : (
+                  <User className='w-7 h-7 text-white' />
+                )}
+              </div>
+              <div className='min-w-0'>
+                <h2 className='text-white font-semibold text-lg truncate'>{partnerName}</h2>
+                <p className='text-green-400 text-sm'>Online</p>
+              </div>
+            </Link>
+          )}
         </div>
+
+        {isTrainer && (
+          <Button
+            onClick={() => setIsSessionModalOpen(true)}
+            className='flex items-center gap-1.5 bg-[#D98A9D]/20 hover:bg-[#D98A9D]/30 text-[#D98A9D] font-semibold px-3 py-2 rounded-xl transition-all ml-[150px] mt-10 whitespace-nowrap'
+            size='sm'
+            title='Create session with this user'
+          >
+            <Plus size={16} />
+            <span className='hidden sm:inline text-xs'>Session</span>
+          </Button>
+        )}
       </div>
 
+      {/* Messages Area */}
       <div className='flex-1 overflow-y-auto p-6 space-y-4 min-w-0'>
         {isLoading && messages.length === 0 ? (
           <div className='flex justify-center items-center h-full text-gray-500'>
@@ -157,6 +211,7 @@ export const TrainerMessagesWindow = ({
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Input Area */}
       <div className='p-6 bg-[#1a0F16] border-t border-white/10 flex-shrink-0'>
         <div className='flex items-end gap-3'>
           <Textarea
@@ -178,6 +233,17 @@ export const TrainerMessagesWindow = ({
           </Button>
         </div>
       </div>
+
+      <TrainingSessionModal
+        isOpen={isSessionModalOpen}
+        onClose={() => setIsSessionModalOpen(false)}
+        onSave={() => {
+          setIsSessionModalOpen(false);
+        }}
+        initialData={undefined}
+        isEditing={false}
+        users={[{ id: partnerId, name: partnerName }]}
+      />
     </div>
   );
 };

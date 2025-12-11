@@ -6,23 +6,18 @@ import {
   Menu,
   X,
   Home,
-  TrendingUp,
   UtensilsCrossed,
   Dumbbell,
-  Settings,
-  HelpCircle,
   Sparkles,
   AlarmClock,
   MessageSquare,
 } from 'lucide-react';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
 import { useAuthStore } from '@/store/auth.store';
-import { useTrainerStore } from '@/store/trainer.store';
 
 export const Header = () => {
   const navigate = useNavigate();
   const { user, logout, fetchMe } = useAuthStore();
-  const { trainer } = useTrainerStore();
   const { success, error: toastError } = useCustomToast();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -51,7 +46,7 @@ export const Header = () => {
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/trainers' },
-    { id: 'trends', label: 'Trends', icon: TrendingUp, href: '/trends' },
+    //{ id: 'trends', label: 'Trends', icon: TrendingUp, href: '/trends' },
     { id: 'nutrition', label: 'Nutrition', icon: UtensilsCrossed, href: '/nutrition' },
     { id: 'activity', label: 'Activity', icon: Dumbbell, href: '/activity' },
     { id: 'sleep', label: 'Sleep', icon: AlarmClock, href: '/sleep' },
@@ -59,7 +54,7 @@ export const Header = () => {
   ];
 
   const trainerNavItems = [
-    { id: 'clients', label: 'Clients', icon: Dumbbell, href: '/trainer/clients' },
+    //{ id: 'clients', label: 'Clients', icon: Dumbbell, href: '/trainer/clients' },
     { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/trainers' },
     { id: 'chat', label: 'Chat', icon: MessageSquare, href: '/chat' },
   ];
@@ -80,10 +75,22 @@ export const Header = () => {
 
   return (
     <>
+      <style>{`
+        @keyframes pulse-border {
+          0%, 100% { border-color: rgb(217, 138, 157, 0.3); }
+          50% { border-color: rgb(217, 138, 157, 0.8); }
+        }
+        .pulse-menu {
+          animation: pulse-border 2s ease-in-out infinite;
+        }
+      `}</style>
+
       {/* Mobile Menu Toggle Button */}
       <button
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className='fixed top-4 left-4 z-50 lg:hidden text-white hover:bg-white/10 p-2 rounded-lg transition-colors'
+        className={`fixed top-4 left-4 z-50 lg:hidden p-2.5 rounded-lg text-[#D98A9D] bg-white/5 hover:bg-white/10 border-2 transition-all duration-300 ${
+          mobileMenuOpen ? '' : 'pulse-menu'
+        }`}
         aria-label='Toggle menu'
       >
         {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -95,7 +102,7 @@ export const Header = () => {
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <div className='flex h-full flex-col justify-between p-4'>
+        <div className='flex h-full flex-col justify-between p-4 pt-20 lg:pt-4'>
           {/* Top Section */}
           <div className='flex flex-col gap-4'>
             {/* User Section */}
@@ -133,7 +140,7 @@ export const Header = () => {
                   </span>
 
                   {/* Trainer Status Badge */}
-                  {isTrainer && trainer && (
+                  {/* {isTrainer && trainer && (
                     <span
                       className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded border flex items-center gap-1 ${
                         trainer.isActive
@@ -148,7 +155,7 @@ export const Header = () => {
                       ></span>
                       {trainer.isActive ? 'Active' : 'Inactive'}
                     </span>
-                  )}
+                  )} */}
 
                   {user.isPremium && (
                     <span className='text-xs font-bold uppercase tracking-wider px-2 py-1 rounded border bg-amber-500/20 text-amber-400 border-amber-500/30 flex items-center gap-1'>
@@ -257,10 +264,8 @@ export const Header = () => {
               </Link>
             )} */}
 
-            {/* Settings and Help Section */}
             <div className='flex flex-col gap-1 border-t border-white/10 pt-4'>
-              {/* Settings - Only for authorized users */}
-              {user && (
+              {/* {user && (
                 <Link to='/'>
                   <Button
                     variant='ghost'
@@ -272,15 +277,13 @@ export const Header = () => {
                   </Button>
                 </Link>
               )}
-
-              {/* Help - Always visible */}
               <Button
                 variant='ghost'
                 className='w-full justify-start text-white hover:bg-white/10 hover:text-[#D98A9D]'
               >
                 <HelpCircle size={20} className='mr-3 text-[#D98A9D]' />
                 Help
-              </Button>
+              </Button> */}
 
               {/* Logout - Only for authorized users */}
               {user && (

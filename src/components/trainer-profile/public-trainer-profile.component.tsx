@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
-import { useNavigate } from '@tanstack/react-router';
+import { ArrowLeft } from 'lucide-react';
 import { useTrainerStore } from '@/store/trainer.store';
 import { useUserStore } from '@/store/user.store';
 import { useAuthStore } from '@/store/auth.store';
@@ -12,45 +11,75 @@ interface Certification {
   url: string;
 }
 
+interface Experience {
+  id: string;
+  title: string;
+  description?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
 interface PublicTrainerProfileComponentProps {
   id: string;
 }
 
 export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileComponentProps) => {
-  const navigate = useNavigate();
   const { user: currentUser } = useAuthStore();
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date().getDate());
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
-  const { trainer, getTrainerById } = useTrainerStore();
-  const { user, getUserById } = useUserStore();
+  const [trainer, setTrainer] = useState<{ certification?: string; isActive?: boolean; bio?: string; specialization?: string; location?: string; userId?: string; experience?: Experience[] } | null>(null);
+  const [user, setUser] = useState<any>(null);
+
+  const { getTrainerById } = useTrainerStore();
+  const { getUserById } = useUserStore();
 
   useEffect(() => {
+    let isMounted = true;
+
     const loadData = async () => {
       setIsLoadingData(true);
+      setError(null);
       try {
         const loadedTrainer = await getTrainerById(id);
+
+        if (!isMounted) return;
+        
         if (!loadedTrainer) {
           setError('Trainer not found');
+          setTrainer(null);
           setIsLoadingData(false);
           return;
         }
 
         const loadedUser = await getUserById(loadedTrainer.userId);
+
+        if (!isMounted) return;
+        
+        setTrainer(loadedTrainer);
+        
         if (!loadedUser) {
           setError('User-trainer not found');
+        } else {
+          setUser(loadedUser);
         }
-      } catch {
-        setError('Failed to load trainer profile');
+      } catch (err) {
+        if (isMounted) {
+          setError('Failed to load trainer profile');
+        }
       } finally {
-        setIsLoadingData(false);
+        if (isMounted) {
+          setIsLoadingData(false);
+        }
       }
     };
 
     void loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [id, getTrainerById, getUserById]);
 
   useEffect(() => {
@@ -68,14 +97,6 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
     }
   }, [trainer?.certification]);
 
-  const getDaysInMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-  };
-
-  const getFirstDayOfMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-  };
-
   const formatDateDisplay = (dateString: string | undefined): string => {
     if (!dateString) return '–';
 
@@ -91,53 +112,6 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
     }
 
     return dateString;
-  };
-
-  const renderCalendar = () => {
-    const daysInMonth = getDaysInMonth(currentMonth);
-    const firstDay = getFirstDayOfMonth(currentMonth);
-    const days = [];
-    const weekDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
-    for (let i = 0; i < firstDay; i++) {
-      days.push(
-        <div key={`empty-${i}`} className='text-gray-500/50 p-2'>
-          {new Date(
-            currentMonth.getFullYear(),
-            currentMonth.getMonth(),
-            -firstDay + i + 1
-          ).getDate()}
-        </div>
-      );
-    }
-
-    for (let i = 1; i <= daysInMonth; i++) {
-      const isSelected = i === selectedDate;
-      days.push(
-        <button
-          key={i}
-          onClick={() => setSelectedDate(i)}
-          className={`p-2 rounded-lg cursor-pointer transition-all ${
-            isSelected
-              ? 'bg-[#D98A9D] text-[#1e1416] font-bold'
-              : 'hover:bg-[#D98A9D]/20 text-white'
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    return (
-      <div className='space-y-4'>
-        <div className='grid grid-cols-7 gap-2 text-center text-xs font-bold text-gray-400 pb-2'>
-          {weekDays.map(day => (
-            <div key={day}>{day}</div>
-          ))}
-        </div>
-        <div className='grid grid-cols-7 gap-2'>{days}</div>
-      </div>
-    );
   };
 
   if (isLoadingData) {
@@ -163,7 +137,7 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
         </div>
         <main className='relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12'>
           <button
-            onClick={() => navigate({ to: '/' })}
+            onClick={() => window.history.back()}
             className='flex items-center gap-2 text-[#D98A9D] hover:text-[#c87b8f] transition-colors mb-8'
           >
             <ArrowLeft size={20} />
@@ -187,7 +161,7 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
 
       <main className='relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12'>
         <button
-          onClick={() => navigate({ to: '/' })}
+          onClick={() => window.history.back()}
           className='flex items-center gap-2 text-[#D98A9D] hover:text-[#c87b8f] transition-colors mb-8'
         >
           <ArrowLeft size={20} />
@@ -278,58 +252,6 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
           </div>
         </div>
 
-        <div className='grid gap-6 lg:grid-cols-2 mb-8'>
-          <div className='rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-6'>
-            <h2 className='text-xl font-bold text-white mb-6'>Schedule</h2>
-
-            <div className='flex items-center justify-between mb-6'>
-              <button
-                onClick={() =>
-                  setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))
-                }
-                className='p-2 rounded-full hover:bg-white/10 transition-colors'
-              >
-                <ChevronLeft size={20} className='text-gray-400' />
-              </button>
-              <div className='flex items-center gap-4'>
-                <button className='px-4 py-2 rounded-lg hover:bg-white/10 text-white font-semibold'>
-                  {currentMonth.toLocaleString('default', { month: 'long' })}
-                </button>
-                <button className='px-4 py-2 rounded-lg hover:bg-white/10 text-white font-semibold'>
-                  {currentMonth.getFullYear()}
-                </button>
-              </div>
-              <button
-                onClick={() =>
-                  setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))
-                }
-                className='p-2 rounded-full hover:bg-white/10 transition-colors'
-              >
-                <ChevronRight size={20} className='text-gray-400' />
-              </button>
-            </div>
-
-            {renderCalendar()}
-          </div>
-
-          <div className='rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-6'>
-            <h2 className='text-xl font-bold text-white mb-2'>
-              {currentMonth.toLocaleString('default', { month: 'long' })} {selectedDate},{' '}
-              {currentMonth.getFullYear()}
-            </h2>
-            <p className='text-gray-500 text-sm mb-6'>Sessions for selected date</p>
-
-            <div className='space-y-3'>
-              <div className='pt-4 border-t border-white/10'>
-                <div className='rounded-lg bg-[#D98A9D]/10 border border-[#D98A9D]/30 p-4 text-center'>
-                  <p className='text-[#D98A9D] text-sm font-semibold'>Coming Soon</p>
-                  <p className='text-gray-400 text-xs mt-1'>Session management features</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className='rounded-2xl border border-white/10 bg-[#181114] backdrop-blur-md p-6 mb-8'>
           <h2 className='text-xl font-bold text-white mb-6'>Certifications</h2>
 
@@ -372,7 +294,7 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
                 <p className='text-gray-400 text-sm'>No experience</p>
               </div>
             ) : (
-              trainer.experience.map(exp => (
+              trainer.experience.map((exp: Experience) => (
                 <div key={exp.id}>
                   <div className='absolute -left-[6.5px] top-1 h-3 w-3 rounded-full bg-[#D98A9D]'></div>
                   <div className='flex justify-between items-start'>

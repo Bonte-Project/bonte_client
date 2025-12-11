@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Edit2, Zap, Moon, Activity, MessageSquare, Crown, ArrowRight } from 'lucide-react';
 import { ProfileEditModal } from './profile-edit-modal.component';
 import { useAuthStore } from '@/store/auth.store';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
+import { useTrainerMessagesStore } from '@/store/trainer-messages.store';
 import type { User } from '@/types/auth.types';
 import { Link } from '@tanstack/react-router';
+import { UserTrainingScheduleComponent } from '@/components/user-profile/user-training-schedule.component';
 
 interface ProfileComponentProps {
   user?: User;
@@ -14,9 +16,28 @@ interface ProfileComponentProps {
 export const ProfileComponent = ({ user, onProfileUpdate }: ProfileComponentProps) => {
   const authUser = useAuthStore(state => state.user);
   const { success } = useCustomToast();
+  const { getChatsListIds } = useTrainerMessagesStore();
 
   const currentUser = user || authUser;
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isLoadingChatPartners, setIsLoadingChatPartners] = useState(false);
+
+  useEffect(() => {
+    const loadChatPartners = async () => {
+      if (!currentUser) return;
+
+      setIsLoadingChatPartners(true);
+      try {
+        await getChatsListIds();
+      } catch (error) {
+        console.error('Failed to load chat partners:', error);
+      } finally {
+        setIsLoadingChatPartners(false);
+      }
+    };
+
+    loadChatPartners();
+  }, [currentUser, getChatsListIds]);
 
   const handleProfileUpdate = (updatedUser: User) => {
     onProfileUpdate?.(updatedUser);
@@ -192,17 +213,22 @@ export const ProfileComponent = ({ user, onProfileUpdate }: ProfileComponentProp
                 Connect with your personal trainer for guidance and support
               </p>
             </div>
-            <Link to='/'>
+            <Link to='/chat'>
               <button
-                disabled
                 type='button'
-                className='transform rounded-lg bg-[#D98A9D]/20 px-8 py-3 text-base font-bold text-[#D98A9D] border border-[#D98A9D]/30 transition-all duration-300 hover:bg-[#D98A9D]/30 opacity-60 cursor-not-allowed flex items-center gap-2 whitespace-nowrap'
+                className='mt-6 w-full transform rounded-lg bg-[#D98A9D] px-4 py-3 text-sm font-bold text-white border border-[#D98A9D]/30 transition-all duration-300 hover:bg-[#c87b8f]/70 hover:scale-[1.02]  flex items-center justify-center gap-2'
               >
                 Open Chat <ArrowRight size={18} />
               </button>
             </Link>
           </div>
         </div>
+
+        {currentUser.role === 'user' && !isLoadingChatPartners && (
+          <div className='mt-8'>
+            <UserTrainingScheduleComponent />
+          </div>
+        )}
 
         {/* Premium Section */}
         <div className='relative overflow-hidden rounded-2xl border border-[#D98A9D]/30 bg-linear-to-br from-[#D98A9D]/10 to-[#D98A9D]/5 backdrop-blur-md p-8 shadow-lg lg:p-10'>
