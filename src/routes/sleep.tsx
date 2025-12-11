@@ -1,0 +1,38 @@
+import SleepPage from '@/pages/sleep.page';
+import { createFileRoute } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
+import { useAuthStore } from '@/store/auth.store';
+import { useEffect } from 'react';
+
+export const Route = createFileRoute('/sleep')({
+  component: RouteComponent,
+});
+
+function RouteComponent() {
+  const { user } = useAuthStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      void navigate({ to: '/login' });
+      return;
+    }
+
+    switch (user.role) {
+      case 'admin':
+        void navigate({ to: '/' });
+        break;
+      case 'trainer':
+        void navigate({ to: '/trainer-profile' });
+        break;
+    }
+  }, [user, navigate]);
+
+  if (!user) return null;
+
+  if (user.role === 'user') {
+    return <SleepPage />;
+  }
+
+  return null;
+}

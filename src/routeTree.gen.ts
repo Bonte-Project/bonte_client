@@ -9,9 +9,77 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as TrainersRouteImport } from './routes/trainers'
+import { Route as TrainerProfileRouteImport } from './routes/trainer-profile'
+import { Route as SleepRouteImport } from './routes/sleep'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as NutritionRouteImport } from './routes/nutrition'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as ChatRouteImport } from './routes/chat'
+import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UserIdRouteImport } from './routes/user.$id'
+import { Route as TrainerIdRouteImport } from './routes/trainer.$id'
 
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrainersRoute = TrainersRouteImport.update({
+  id: '/trainers',
+  path: '/trainers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrainerProfileRoute = TrainerProfileRouteImport.update({
+  id: '/trainer-profile',
+  path: '/trainer-profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SleepRoute = SleepRouteImport.update({
+  id: '/sleep',
+  path: '/sleep',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NutritionRoute = NutritionRouteImport.update({
+  id: '/nutrition',
+  path: '/nutrition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActivityRoute = ActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -22,35 +90,220 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UserIdRoute = UserIdRouteImport.update({
+  id: '/user/$id',
+  path: '/user/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrainerIdRoute = TrainerIdRouteImport.update({
+  id: '/trainer/$id',
+  path: '/trainer/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/activity': typeof ActivityRoute
+  '/chat': typeof ChatRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/nutrition': typeof NutritionRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
+  '/sleep': typeof SleepRoute
+  '/trainer-profile': typeof TrainerProfileRoute
+  '/trainers': typeof TrainersRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/trainer/$id': typeof TrainerIdRoute
+  '/user/$id': typeof UserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/activity': typeof ActivityRoute
+  '/chat': typeof ChatRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/nutrition': typeof NutritionRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
+  '/sleep': typeof SleepRoute
+  '/trainer-profile': typeof TrainerProfileRoute
+  '/trainers': typeof TrainersRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/trainer/$id': typeof TrainerIdRoute
+  '/user/$id': typeof UserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/activity': typeof ActivityRoute
+  '/chat': typeof ChatRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/nutrition': typeof NutritionRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
+  '/sleep': typeof SleepRoute
+  '/trainer-profile': typeof TrainerProfileRoute
+  '/trainers': typeof TrainersRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/trainer/$id': typeof TrainerIdRoute
+  '/user/$id': typeof UserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/activity'
+    | '/chat'
+    | '/forgot-password'
+    | '/login'
+    | '/nutrition'
+    | '/profile'
+    | '/register'
+    | '/sleep'
+    | '/trainer-profile'
+    | '/trainers'
+    | '/verify-email'
+    | '/trainer/$id'
+    | '/user/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to:
+    | '/'
+    | '/about'
+    | '/activity'
+    | '/chat'
+    | '/forgot-password'
+    | '/login'
+    | '/nutrition'
+    | '/profile'
+    | '/register'
+    | '/sleep'
+    | '/trainer-profile'
+    | '/trainers'
+    | '/verify-email'
+    | '/trainer/$id'
+    | '/user/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/activity'
+    | '/chat'
+    | '/forgot-password'
+    | '/login'
+    | '/nutrition'
+    | '/profile'
+    | '/register'
+    | '/sleep'
+    | '/trainer-profile'
+    | '/trainers'
+    | '/verify-email'
+    | '/trainer/$id'
+    | '/user/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ActivityRoute: typeof ActivityRoute
+  ChatRoute: typeof ChatRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
+  NutritionRoute: typeof NutritionRoute
+  ProfileRoute: typeof ProfileRoute
+  RegisterRoute: typeof RegisterRoute
+  SleepRoute: typeof SleepRoute
+  TrainerProfileRoute: typeof TrainerProfileRoute
+  TrainersRoute: typeof TrainersRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
+  TrainerIdRoute: typeof TrainerIdRoute
+  UserIdRoute: typeof UserIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trainers': {
+      id: '/trainers'
+      path: '/trainers'
+      fullPath: '/trainers'
+      preLoaderRoute: typeof TrainersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trainer-profile': {
+      id: '/trainer-profile'
+      path: '/trainer-profile'
+      fullPath: '/trainer-profile'
+      preLoaderRoute: typeof TrainerProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sleep': {
+      id: '/sleep'
+      path: '/sleep'
+      fullPath: '/sleep'
+      preLoaderRoute: typeof SleepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nutrition': {
+      id: '/nutrition'
+      path: '/nutrition'
+      fullPath: '/nutrition'
+      preLoaderRoute: typeof NutritionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/activity': {
+      id: '/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof ActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -65,12 +318,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/user/$id': {
+      id: '/user/$id'
+      path: '/user/$id'
+      fullPath: '/user/$id'
+      preLoaderRoute: typeof UserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trainer/$id': {
+      id: '/trainer/$id'
+      path: '/trainer/$id'
+      fullPath: '/trainer/$id'
+      preLoaderRoute: typeof TrainerIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ActivityRoute: ActivityRoute,
+  ChatRoute: ChatRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
+  NutritionRoute: NutritionRoute,
+  ProfileRoute: ProfileRoute,
+  RegisterRoute: RegisterRoute,
+  SleepRoute: SleepRoute,
+  TrainerProfileRoute: TrainerProfileRoute,
+  TrainersRoute: TrainersRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
+  TrainerIdRoute: TrainerIdRoute,
+  UserIdRoute: UserIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
