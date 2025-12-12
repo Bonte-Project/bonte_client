@@ -1116,13 +1116,15 @@ export const ExperienceModal = ({
   onClose,
   onSave,
   initialData,
+  isLoading = false,
   isEditing = false,
 }: ExperienceModalProps) => {
   const [title, setTitle] = useState(initialData?.title || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [startDate, setStartDate] = useState(initialData?.startDate || '');
-  const [endDate, setEndDate] = useState(
-    initialData?.endDate === 'Present' ? '' : initialData?.endDate || ''
+  const [endDate, setEndDate] = useState(initialData?.endDate || '');
+  const [isCurrentlyWorking, setIsCurrentlyWorking] = useState(
+    initialData?.endDate === 'Present' || !initialData?.endDate
   );
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Set<string>>(new Set());
@@ -1136,6 +1138,7 @@ export const ExperienceModal = ({
       setDescription(initialData.description || '');
       setStartDate(initialData.startDate || '');
       setEndDate(initialData.endDate || '');
+      setIsCurrentlyWorking(initialData.endDate === 'Present' || !initialData.endDate);
       setErrors({});
       setTouched(new Set());
     } else if (isOpen && !isEditing) {
@@ -1143,6 +1146,7 @@ export const ExperienceModal = ({
       setDescription('');
       setStartDate('');
       setEndDate('');
+      setIsCurrentlyWorking(true);
       setErrors({});
       setTouched(new Set());
     }
@@ -1159,7 +1163,7 @@ export const ExperienceModal = ({
       error = FormValidator.validateDescription(value);
     } else if (field === 'startDate') {
       error = FormValidator.validateStartDate(value);
-    } else if (field === 'endDate') {
+    } else if (field === 'endDate' && !isCurrentlyWorking) {
       error = FormValidator.validateEndDate(value, startDate);
     }
 
@@ -1171,12 +1175,13 @@ export const ExperienceModal = ({
       title: FormValidator.validateJobTitle(title),
       description: FormValidator.validateDescription(description),
       startDate: FormValidator.validateStartDate(startDate),
-      endDate: FormValidator.validateEndDate(endDate, startDate),
+      endDate: isCurrentlyWorking ? undefined : FormValidator.validateEndDate(endDate, startDate),
     };
 
     setErrors(newErrors);
     return Object.values(newErrors).every(error => !error);
   };
+
   const handleBlur = (field: string) => {
     setTouched(prev => new Set([...prev, field]));
     const value =
@@ -1215,7 +1220,7 @@ export const ExperienceModal = ({
         title,
         description,
         startDate: formatDateToISO(startDate),
-        endDate: formatDateToISO(endDate),
+        endDate: isCurrentlyWorking ? 'Present' : formatDateToISO(endDate),
       });
 
       success(isEditing ? 'Experience Updated' : 'Experience Added', {
@@ -1228,6 +1233,7 @@ export const ExperienceModal = ({
       setDescription('');
       setStartDate('');
       setEndDate('');
+      setIsCurrentlyWorking(true);
       setErrors({});
       setTouched(new Set());
       onClose();
@@ -1254,7 +1260,7 @@ export const ExperienceModal = ({
           </h2>
           <button
             onClick={onClose}
-            disabled={isSaving}
+            disabled={isSaving || isLoading}
             className='text-gray-400 hover:text-white transition-colors disabled:opacity-50'
           >
             <X size={24} />
@@ -1266,7 +1272,7 @@ export const ExperienceModal = ({
             <label className='pb-2 text-sm font-medium text-gray-400 uppercase tracking-wide'>
               Job Title
             </label>
-            <Input
+            <input
               type='text'
               placeholder='e.g., Head Trainer'
               value={title}
@@ -1277,7 +1283,7 @@ export const ExperienceModal = ({
                 }
               }}
               onBlur={() => handleBlur('title')}
-              disabled={isSaving}
+              disabled={isSaving || isLoading}
               className={`h-12 w-full rounded-xl px-4 py-3 bg-[#322840]/60 border text-white focus:outline-none transition-all ${
                 errors.title && touched.has('title')
                   ? 'border-red-500/50 focus:border-red-500'
@@ -1303,7 +1309,7 @@ export const ExperienceModal = ({
                 }
               }}
               onBlur={() => handleBlur('description')}
-              disabled={isSaving}
+              disabled={isSaving || isLoading}
               rows={4}
               className={`w-full rounded-xl px-4 py-3 bg-[#322840]/60 border text-white focus:outline-none transition-all resize-none ${
                 errors.description && touched.has('description')
@@ -1322,7 +1328,7 @@ export const ExperienceModal = ({
               <label className='pb-2 text-sm font-medium text-gray-400 uppercase tracking-wide'>
                 Start Date
               </label>
-              <Input
+              <input
                 type='month'
                 value={startDate}
                 onChange={e => {
@@ -1330,17 +1336,17 @@ export const ExperienceModal = ({
                   if (touched.has('startDate')) {
                     validateField('startDate', e.target.value);
                   }
-                  if (endDate && e.target.value > endDate) {
+                  if (!isCurrentlyWorking && endDate && e.target.value > endDate) {
                     validateField('endDate', endDate);
                   }
                 }}
                 onBlur={() => handleBlur('startDate')}
-                disabled={isSaving}
+                disabled={isSaving || isLoading}
                 className={`h-12 w-full rounded-xl px-4 py-3 bg-[#322840]/60 border text-white focus:outline-none transition-all ${
                   errors.startDate && touched.has('startDate')
                     ? 'border-red-500/50 focus:border-red-500'
                     : 'border-white/10 focus:border-[#ff1493]'
-                } disabled:opacity-50`}
+                } disabled:opacity-50 [color-scheme:dark]`}
               />
               {errors.startDate && touched.has('startDate') && (
                 <p className='mt-2 text-xs text-red-400'>{errors.startDate}</p>
@@ -1351,41 +1357,66 @@ export const ExperienceModal = ({
               <label className='pb-2 text-sm font-medium text-gray-400 uppercase tracking-wide'>
                 End Date
               </label>
-              <Input
-                type='month'
-                value={endDate}
-                onChange={e => {
-                  setEndDate(e.target.value);
-                  if (touched.has('endDate')) {
-                    validateField('endDate', e.target.value);
-                  }
-                }}
-                onBlur={() => handleBlur('endDate')}
-                disabled={isSaving}
-                className={`h-12 w-full rounded-xl px-4 py-3 bg-[#322840]/60 border text-white focus:outline-none transition-all ${
-                  errors.endDate && touched.has('endDate')
-                    ? 'border-red-500/50 focus:border-red-500'
-                    : 'border-white/10 focus:border-[#ff1493]'
-                } disabled:opacity-50`}
-              />
-              {errors.endDate && touched.has('endDate') && (
-                <p className='mt-2 text-xs text-red-400'>{errors.endDate}</p>
-              )}
+              <div>
+                <input
+                  type='month'
+                  value={endDate}
+                  onChange={e => {
+                    setEndDate(e.target.value);
+                    if (touched.has('endDate')) {
+                      validateField('endDate', e.target.value);
+                    }
+                  }}
+                  onBlur={() => handleBlur('endDate')}
+                  disabled={isSaving || isLoading || isCurrentlyWorking}
+                  className={`h-12 w-full rounded-xl px-4 py-3 bg-[#322840]/60 border text-white focus:outline-none transition-all ${
+                    errors.endDate && touched.has('endDate')
+                      ? 'border-red-500/50 focus:border-red-500'
+                      : 'border-white/10 focus:border-[#ff1493]'
+                  } disabled:opacity-50 [color-scheme:dark]`}
+                />
+                {errors.endDate && touched.has('endDate') && (
+                  <p className='mt-2 text-xs text-red-400'>{errors.endDate}</p>
+                )}
+              </div>
             </div>
+          </div>
+
+          <div className='flex items-center gap-3 p-4 rounded-xl bg-[#322840]/40 border border-[#36282F]'>
+            <input
+              type='checkbox'
+              id='currently-working'
+              checked={isCurrentlyWorking}
+              onChange={e => {
+                setIsCurrentlyWorking(e.target.checked);
+                if (e.target.checked) {
+                  setEndDate('');
+                  setErrors(prev => ({ ...prev, endDate: undefined }));
+                }
+              }}
+              disabled={isSaving || isLoading}
+              className='w-5 h-5 cursor-pointer accent-[#D98A9D]'
+            />
+            <label
+              htmlFor='currently-working'
+              className='text-sm font-medium text-gray-300 cursor-pointer flex-1'
+            >
+              I currently work here
+            </label>
           </div>
         </div>
 
         <div className='flex gap-3 mt-8'>
           <button
             onClick={onClose}
-            disabled={isSaving}
+            disabled={isSaving || isLoading}
             className='flex-1 bg-white/10 text-white font-semibold py-3 rounded-xl transition-all hover:bg-white/20 disabled:opacity-50'
           >
             Cancel
           </button>
           <button
             onClick={() => void handleSave()}
-            disabled={isSaving}
+            disabled={isSaving || isLoading}
             className='flex-1 bg-[#D98A9D] text-white font-semibold py-3 rounded-xl transition-all shadow-lg shadow-[#D98A9D]/20 hover:bg-[#c87b8f] hover:scale-[1.02] disabled:opacity-70 disabled:scale-100'
           >
             {isSaving

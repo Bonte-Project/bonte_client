@@ -14,12 +14,23 @@ import type {
   Experience,
   GetAllTrainersResponse,
 } from '@/types/trainer.types';
+import type {
+  TrainingSession,
+  CreateTrainingSessionRequest,
+  UpdateTrainingSessionRequest,
+  GetTrainingSessionsResponse,
+  CreateTrainingSessionResponse,
+  UpdateTrainingSessionResponse,
+  DeleteTrainingSessionResponse,
+} from '@/types/training-sessions.types';
 
 interface TrainerState {
   isLoading: boolean;
   error: string | null;
   trainer: Trainer | null;
   experience: Experience | null;
+  trainingSessions: TrainingSession[];
+  isLoadingSession: boolean;
 
   createTrainer: (data: CreateTrainerRequest) => Promise<boolean>;
   updateTrainer: (data: UpdateTrainerRequest) => Promise<boolean>;
@@ -29,6 +40,13 @@ interface TrainerState {
   updateExperience: (experienceId: string, data: UpdateExperienceRequest) => Promise<boolean>;
   deleteExperience: (experienceId: string) => Promise<boolean>;
   getAllTrainers: () => Promise<Trainer[] | null>;
+  getTrainingSessions: () => Promise<boolean>;
+  createTrainingSession: (data: CreateTrainingSessionRequest) => Promise<boolean>;
+  updateTrainingSession: (
+    sessionId: string,
+    data: UpdateTrainingSessionRequest
+  ) => Promise<boolean>;
+  deleteTrainingSession: (sessionId: string) => Promise<boolean>;
   clearError: () => void;
 }
 
@@ -37,6 +55,8 @@ export const useTrainerStore = create<TrainerState>((set, get) => ({
   error: null,
   trainer: null,
   experience: null,
+  trainingSessions: [],
+  isLoadingSession: false,
 
   createTrainer: async (data: CreateTrainerRequest) => {
     set({ isLoading: true, error: null });
@@ -269,6 +289,128 @@ export const useTrainerStore = create<TrainerState>((set, get) => ({
 
       set({ isLoading: false, error: message });
       return null;
+    }
+  },
+
+  getTrainingSessions: async () => {
+    set({ isLoadingSession: true, error: null });
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        set({ isLoadingSession: false, error: 'Missing token' });
+        return false;
+      }
+
+      const response = await apiRequest<GetTrainingSessionsResponse>('/training-sessions/trainer', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      set({ isLoadingSession: false, trainingSessions: response.sessions });
+      return true;
+    } catch (error) {
+      const message =
+        error instanceof ApiError ? error.message : 'Failed to fetch training sessions';
+      set({ isLoadingSession: false, error: message });
+      return false;
+    }
+  },
+
+  createTrainingSession: async (data: CreateTrainingSessionRequest) => {
+    set({ isLoadingSession: true, error: null });
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        set({ isLoadingSession: false, error: 'Missing token' });
+        return false;
+      }
+
+      const response = await apiRequest<CreateTrainingSessionResponse>('/training-sessions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      set(state => ({
+        isLoadingSession: false,
+        trainingSessions: [...state.trainingSessions, response.session],
+      }));
+
+      return true;
+    } catch (error) {
+      const message =
+        error instanceof ApiError ? error.message : 'Failed to create training session';
+      set({ isLoadingSession: false, error: message });
+      return false;
+    }
+  },
+
+  updateTrainingSession: async (sessionId: string, data: UpdateTrainingSessionRequest) => {
+    set({ isLoadingSession: true, error: null });
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        set({ isLoadingSession: false, error: 'Missing token' });
+        return false;
+      }
+
+      const response = await apiRequest<UpdateTrainingSessionResponse>(
+        `/training-sessions/${sessionId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      set(state => ({
+        isLoadingSession: false,
+        trainingSessions: state.trainingSessions.map(session =>
+          session.id === sessionId ? response.session : session
+        ),
+      }));
+
+      return true;
+    } catch (error) {
+      const message =
+        error instanceof ApiError ? error.message : 'Failed to update training session';
+      set({ isLoadingSession: false, error: message });
+      return false;
+    }
+  },
+
+  deleteTrainingSession: async (sessionId: string) => {
+    set({ isLoadingSession: true, error: null });
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        set({ isLoadingSession: false, error: 'Missing token' });
+        return false;
+      }
+
+      await apiRequest<DeleteTrainingSessionResponse>(`/training-sessions/${sessionId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      set(state => ({
+        isLoadingSession: false,
+        trainingSessions: state.trainingSessions.filter(session => session.id !== sessionId),
+      }));
+
+      return true;
+    } catch (error) {
+      const message =
+        error instanceof ApiError ? error.message : 'Failed to delete training session';
+      set({ isLoadingSession: false, error: message });
+      return false;
     }
   },
 

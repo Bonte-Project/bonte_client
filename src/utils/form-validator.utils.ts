@@ -456,4 +456,39 @@ export class FormValidator {
 
     return undefined;
   }
+
+  static validateSessionName(value: string): string | undefined {
+    if (!value || !value.trim()) {
+      return 'Session name is required';
+    }
+    if (value.trim().length < 3) {
+      return 'Session name must be at least 3 characters';
+    }
+    if (value.length > 100) {
+      return 'Session name must not exceed 100 characters';
+    }
+    return undefined;
+  }
+
+  static validateSessionDateTime(value: string): string | undefined {
+    if (!value) {
+      return 'Date and time are required';
+    }
+
+    const selectedDate = new Date(value);
+    const now = new Date();
+
+    if (selectedDate < now) {
+      return 'Session cannot be scheduled in the past';
+    }
+
+    return undefined;
+  }
+
+  static validateSessionUser(value: string): string | undefined {
+    if (!value || !value.trim()) {
+      return 'User is required';
+    }
+    return undefined;
+  }
 }

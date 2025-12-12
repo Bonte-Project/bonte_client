@@ -48,7 +48,7 @@ export const ChatWindow = ({
 
   return (
     <div className='flex-1 flex flex-col h-full bg-[#1e1416] overflow-hidden'>
-      <div className='h-20 bg-[#1a0F16] border-b border-white/10 px-6 flex items-center justify-between flex-shrink-0'>
+      <div className='h-20 bg-[#1a0F16] border-b border-white/10 px-30 flex items-center justify-between flex-shrink-0'>
         <div className='flex items-center gap-4'>
           <div className='w-12 h-12 rounded-full bg-gradient-to-br from-[#D98A9D] to-[#ec1380] flex items-center justify-center overflow-hidden'>
             {partnerAvatar || <User className='w-7 h-7 text-white' />}

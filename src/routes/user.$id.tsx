@@ -19,7 +19,7 @@ function RouteComponent() {
       return;
     }
   }, [user, navigate]);
-  const { id } = useParams({ from: '/trainer/$id' });
+  const { id } = useParams({ from: '/user/$id' });
   if (user) return <PublicProfilePage id={id} />;
   return null;
 }

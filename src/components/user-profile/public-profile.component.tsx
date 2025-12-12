@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Crown, ArrowLeft } from 'lucide-react';
-import { useNavigate } from '@tanstack/react-router';
 import { useUserStore } from '@/store/user.store';
 import type { User } from '@/types/auth.types';
 
@@ -9,7 +8,6 @@ interface PublicProfileComponentProps {
 }
 
 export const PublicProfileComponent = ({ id }: PublicProfileComponentProps) => {
-  const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,7 +57,7 @@ export const PublicProfileComponent = ({ id }: PublicProfileComponentProps) => {
         </div>
         <main className='relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12'>
           <button
-            onClick={() => navigate({ to: '/' })}
+            onClick={() => window.history.back()}
             className='flex items-center gap-2 text-[#D98A9D] hover:text-[#c87b8f] transition-colors mb-8'
           >
             <ArrowLeft size={20} />
@@ -82,7 +80,7 @@ export const PublicProfileComponent = ({ id }: PublicProfileComponentProps) => {
 
       <main className='relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12'>
         <button
-          onClick={() => navigate({ to: '/' })}
+          onClick={() => window.history.back()}
           className='flex items-center gap-2 text-[#D98A9D] hover:text-[#c87b8f] transition-colors mb-8'
         >
           <ArrowLeft size={20} />

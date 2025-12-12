@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, Activity } from 'lucide-react';
 import { useActivityLogsStore } from '@/store/activity-logs.store';
 import { useCustomToast } from '@/hooks/use-custom-toast.hooks';
 import { AddActivityModal } from './add-activity-modal.component';
@@ -53,11 +53,7 @@ export const ActivityTrackerSummary = () => {
       <div className='w-full'>
         {/* Header Section */}
         <div className='flex flex-col items-center justify-center text-center mb-12'>
-          <div className='w-16 h-16 bg-[#d98a9d] rounded-full flex items-center justify-center mb-4'>
-            <svg className='w-8 h-8 text-white' fill='currentColor' viewBox='0 0 24 24'>
-              <path d='M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42A8.962 8.962 0 0 0 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9a8.994 8.994 0 0 0 7.03-14.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z' />
-            </svg>
-          </div>
+          <Activity className='w-14 h-14 sm:w-16 sm:h-16 mx-auto opacity-90 text-[#d98a9d]' />
           <h1 className='text-3xl sm:text-4xl font-black text-white'>Activity Tracker</h1>
           <p className='mt-2 text-gray-400 text-sm sm:text-base max-w-2xl'>
             Log your workouts, track your progress, and get insights to optimize your fitness
@@ -98,12 +94,12 @@ export const ActivityTrackerSummary = () => {
           </div>
         ) : (
           <>
-            {/* Chart and Recent Activities Grid */}
-            <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-              <div className='lg:col-span-2'>
+            {/* Chart and Recent Activities Grid - Responsive Layout */}
+            <div className='grid grid-cols-1 xl:grid-cols-3 gap-6'>
+              <div className='xl:col-span-2'>
                 <ActivityChart logs={logs} isLoading={isLoading} />
               </div>
-              <div className='lg:col-span-1'>
+              <div className='xl:col-span-1'>
                 <RecentActivities
                   logs={logs}
                   onDelete={handleDeleteActivity}

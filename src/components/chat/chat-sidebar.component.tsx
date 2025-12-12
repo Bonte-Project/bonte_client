@@ -41,7 +41,7 @@ export const ChatSidebar = () => {
                 name: trainerUser?.fullName || 'Unknown Trainer',
                 avatar: trainerUser?.avatarUrl || undefined,
                 status: 'online',
-                lastMessage: 'Click to view messages', // Добавляем дефолтное сообщение
+                lastMessage: 'Click to view messages',
               });
             }
           } else if (user?.role === 'trainer') {
@@ -53,7 +53,7 @@ export const ChatSidebar = () => {
                 name: partner.fullName,
                 avatar: partner.avatarUrl,
                 status: 'online',
-                lastMessage: 'Click to view messages', // Добавляем дефолтное сообщение
+                lastMessage: 'Click to view messages',
               });
             }
           }

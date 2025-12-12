@@ -85,18 +85,16 @@ export const RecentActivities = ({ logs, onDelete, isLoading = false }: RecentAc
   };
 
   return (
-    <div className='bg-[#1a0F16] border border-[#36282F] rounded-2xl p-8 h-full flex flex-col'>
-      {/* Заголовок сверху */}
+    <div className='bg-[#1a0F16] border border-[#36282F] rounded-2xl p-8 h-full flex flex-col max-h-[463px]'>
       <h3 className='text-xl sm:text-2xl font-bold text-white mb-6'>Recent Activities</h3>
 
-      {/* Список активности посередине */}
       <div className='flex-1 overflow-hidden flex flex-col'>
         {isLoading ? (
           <div className='flex-1 min-h-0'>
             <RecentActivitiesSkeleton />
           </div>
         ) : (
-          <div className='flex-1 overflow-y-auto space-y-4 min-h-0 pr-2'>
+          <div className='flex-1 overflow-y-auto space-y-4 min-h-0 pr-2 scrollbar-thin scrollbar-container'>
             {filteredLogs.length === 0 ? (
               <div className='text-center py-12'>
                 <p className='text-gray-500 text-sm'>No activities logged yet</p>
@@ -146,7 +144,6 @@ export const RecentActivities = ({ logs, onDelete, isLoading = false }: RecentAc
         )}
       </div>
 
-      {/* Кнопки выбора периода внизу */}
       <div className='flex justify-center gap-4 mt-6 flex-nowrap'>
         <button
           onClick={() => setPeriod('today')}
