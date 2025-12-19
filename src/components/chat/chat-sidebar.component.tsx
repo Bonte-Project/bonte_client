@@ -21,6 +21,7 @@ export const ChatSidebar = () => {
 
   const [trainerChats, setTrainerChats] = useState<ChatContact[]>([]);
   const [loadingTrainerChats, setLoadingTrainerChats] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const loadTrainerChats = async () => {
@@ -113,6 +114,10 @@ export const ChatSidebar = () => {
 
   const allChats = user?.role === 'trainer' ? trainerChats : [...chats, ...trainerChats];
 
+  const filteredChats = allChats.filter(contact =>
+    contact.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className='w-80 bg-[#1a0F16] border-r border-white/10 flex flex-col h-full'>
       <div className='p-4 border-b border-white/10'>
@@ -120,6 +125,8 @@ export const ChatSidebar = () => {
           <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500' />
           <Input
             placeholder='Search contacts...'
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
             className='pl-10 bg-[#322840]/60 border-white/10 text-white placeholder:text-gray-500'
           />
         </div>
@@ -130,8 +137,10 @@ export const ChatSidebar = () => {
           <div className='p-4 text-center text-gray-400 text-sm'>Loading chats...</div>
         ) : allChats.length === 0 ? (
           <div className='p-4 text-center text-gray-400 text-sm'>No chats yet</div>
+        ) : filteredChats.length === 0 ? (
+          <div className='p-4 text-center text-gray-400 text-sm'>No contacts found</div>
         ) : (
-          allChats.map(contact => (
+          filteredChats.map(contact => (
             <button
               key={contact.id}
               onClick={() => handleSelectChat(contact)}

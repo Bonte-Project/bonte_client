@@ -29,7 +29,15 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
   const [error, setError] = useState<string | null>(null);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
-  const [trainer, setTrainer] = useState<{ certification?: string; isActive?: boolean; bio?: string; specialization?: string; location?: string; userId?: string; experience?: Experience[] } | null>(null);
+  const [trainer, setTrainer] = useState<{
+    certification?: string;
+    isActive?: boolean;
+    bio?: string;
+    specialization?: string;
+    location?: string;
+    userId?: string;
+    experience?: Experience[];
+  } | null>(null);
   const [user, setUser] = useState<any>(null);
 
   const { getTrainerById } = useTrainerStore();
@@ -45,7 +53,7 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
         const loadedTrainer = await getTrainerById(id);
 
         if (!isMounted) return;
-        
+
         if (!loadedTrainer) {
           setError('Trainer not found');
           setTrainer(null);
@@ -56,9 +64,9 @@ export const PublicTrainerProfileComponent = ({ id }: PublicTrainerProfileCompon
         const loadedUser = await getUserById(loadedTrainer.userId);
 
         if (!isMounted) return;
-        
+
         setTrainer(loadedTrainer);
-        
+
         if (!loadedUser) {
           setError('User-trainer not found');
         } else {

@@ -73,6 +73,8 @@ export const TrainingSessionModal = ({
 
   if (!isOpen) return null;
 
+  const isScheduledStatus = status === 'scheduled';
+
   const validateField = (field: string, value: string) => {
     let error: string | undefined;
 
@@ -80,9 +82,9 @@ export const TrainingSessionModal = ({
       error = FormValidator.validateSessionName(value);
     } else if (field === 'userId') {
       error = FormValidator.validateSessionUser(value);
-    } else if (field === 'scheduledDate') {
+    } else if (field === 'scheduledDate' && isScheduledStatus) {
       error = FormValidator.validateSessionDateTime(value);
-    } else if (field === 'scheduledTime') {
+    } else if (field === 'scheduledTime' && isScheduledStatus) {
       error = FormValidator.validateSessionDateTime(value);
     }
 
@@ -93,8 +95,12 @@ export const TrainingSessionModal = ({
     const newErrors: FormErrors = {
       name: FormValidator.validateSessionName(name),
       userId: FormValidator.validateSessionUser(userId),
-      scheduledDate: FormValidator.validateSessionDateTime(scheduledDate),
-      scheduledTime: FormValidator.validateSessionDateTime(scheduledTime),
+      scheduledDate: isScheduledStatus
+        ? FormValidator.validateSessionDateTime(scheduledDate)
+        : undefined,
+      scheduledTime: isScheduledStatus
+        ? FormValidator.validateSessionDateTime(scheduledTime)
+        : undefined,
     };
 
     setErrors(newErrors);
@@ -256,12 +262,12 @@ export const TrainingSessionModal = ({
               value={scheduledDate}
               onChange={e => {
                 setScheduledDate(e.target.value);
-                if (touched.has('scheduledDate')) {
+                if (touched.has('scheduledDate') && isScheduledStatus) {
                   validateField('scheduledDate', e.target.value);
                 }
               }}
               onBlur={() => handleBlur('scheduledDate')}
-              disabled={isSaving}
+              disabled={isSaving || !isScheduledStatus}
               className={`h-12 w-full rounded-xl px-4 py-3 bg-[#322840]/60 border text-white focus:outline-none transition-all ${
                 errors.scheduledDate && touched.has('scheduledDate')
                   ? 'border-red-500/50 focus:border-red-500'
@@ -270,6 +276,11 @@ export const TrainingSessionModal = ({
             />
             {errors.scheduledDate && touched.has('scheduledDate') && (
               <p className='mt-2 text-xs text-red-400'>{errors.scheduledDate}</p>
+            )}
+            {!isScheduledStatus && (
+              <p className='mt-2 text-xs text-gray-500'>
+                Date cannot be changed when status is not "Scheduled"
+              </p>
             )}
           </div>
 
@@ -283,12 +294,12 @@ export const TrainingSessionModal = ({
               value={scheduledTime}
               onChange={e => {
                 setScheduledTime(e.target.value);
-                if (touched.has('scheduledTime')) {
+                if (touched.has('scheduledTime') && isScheduledStatus) {
                   validateField('scheduledTime', e.target.value);
                 }
               }}
               onBlur={() => handleBlur('scheduledTime')}
-              disabled={isSaving}
+              disabled={isSaving || !isScheduledStatus}
               className={`h-12 w-full rounded-xl px-4 py-3 bg-[#322840]/60 border text-white focus:outline-none transition-all ${
                 errors.scheduledTime && touched.has('scheduledTime')
                   ? 'border-red-500/50 focus:border-red-500'
@@ -297,6 +308,11 @@ export const TrainingSessionModal = ({
             />
             {errors.scheduledTime && touched.has('scheduledTime') && (
               <p className='mt-2 text-xs text-red-400'>{errors.scheduledTime}</p>
+            )}
+            {!isScheduledStatus && (
+              <p className='mt-2 text-xs text-gray-500'>
+                Time cannot be changed when status is not "Scheduled"
+              </p>
             )}
           </div>
 
